@@ -1,0 +1,861 @@
+{
+  "timestamp": "2026-03-25T22:11:59.552617-03:00",
+  "collected_at": "2026-03-25T22:11:59.552624-03:00",
+  "status": "online",
+  "vlans_count": 37,
+  "pools_count": 50,
+  "networks_count": 164,
+  "total_bandwidth_mbps": 850,
+  "vlan_usage": [
+    {
+      "vlan": 10,
+      "name": "Administrativo",
+      "bandwidth_mbps": 120,
+      "traffic_gb": 145
+    },
+    {
+      "vlan": 20,
+      "name": "Financeiro",
+      "bandwidth_mbps": 200,
+      "traffic_gb": 280
+    },
+    {
+      "vlan": 30,
+      "name": "Vendas",
+      "bandwidth_mbps": 340,
+      "traffic_gb": 420
+    },
+    {
+      "vlan": 40,
+      "name": "Suporte",
+      "bandwidth_mbps": 190,
+      "traffic_gb": 215
+    }
+  ],
+  "top_talkers": [
+    {
+      "ip": "172.16.52.107",
+      "hostname": null,
+      "bandwidth_mbps": 671.5,
+      "total_gb": 1007.3
+    },
+    {
+      "ip": "172.16.77.111",
+      "hostname": null,
+      "bandwidth_mbps": 665.7,
+      "total_gb": 998.5
+    },
+    {
+      "ip": "172.16.52.122",
+      "hostname": null,
+      "bandwidth_mbps": 642.1,
+      "total_gb": 963.2
+    },
+    {
+      "ip": "172.16.201.176",
+      "hostname": null,
+      "bandwidth_mbps": 898.9,
+      "total_gb": 1348.3
+    },
+    {
+      "ip": "172.16.61.250",
+      "hostname": null,
+      "bandwidth_mbps": 574.6,
+      "total_gb": 862.0
+    },
+    {
+      "ip": "172.16.86.156",
+      "hostname": null,
+      "bandwidth_mbps": 757.3,
+      "total_gb": 1135.9
+    },
+    {
+      "ip": "172.16.52.81",
+      "hostname": null,
+      "bandwidth_mbps": 575.3,
+      "total_gb": 862.9
+    },
+    {
+      "ip": "172.16.50.43",
+      "hostname": null,
+      "bandwidth_mbps": 687.3,
+      "total_gb": 1030.9
+    },
+    {
+      "ip": "172.16.56.12",
+      "hostname": null,
+      "bandwidth_mbps": 617.4,
+      "total_gb": 926.1
+    },
+    {
+      "ip": "172.16.86.10",
+      "hostname": null,
+      "bandwidth_mbps": 523.9,
+      "total_gb": 785.9
+    }
+  ],
+  "networks": [
+    {
+      "network": "172.16.50.1/24",
+      "gateway": "172.16.50.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.51.1/24",
+      "gateway": "172.16.51.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.52.1/24",
+      "gateway": "172.16.52.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.55.1/24",
+      "gateway": "172.16.55.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.49.1/24",
+      "gateway": "172.16.49.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.47.1/24",
+      "gateway": "172.16.47.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.1.1/24",
+      "gateway": "172.16.1.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.65.1/24",
+      "gateway": "172.16.65.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.62.1/24",
+      "gateway": "172.16.62.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.71.1/24",
+      "gateway": "172.16.71.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.61.1/24",
+      "gateway": "172.16.61.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.73.1/24",
+      "gateway": "172.16.73.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.60.1/24",
+      "gateway": "172.16.60.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.68.1/24",
+      "gateway": "172.16.68.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.72.1/24",
+      "gateway": "172.16.72.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.74.1/24",
+      "gateway": "172.16.74.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.70.1/24",
+      "gateway": "172.16.70.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.75.1/24",
+      "gateway": "172.16.75.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.81.1/24",
+      "gateway": "172.16.81.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.82.1/24",
+      "gateway": "172.16.82.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.63.1/24",
+      "gateway": "172.16.63.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.64.1/24",
+      "gateway": "172.16.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.76.1/24",
+      "gateway": "172.16.76.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.77.1/24",
+      "gateway": "172.16.77.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.84.1/24",
+      "gateway": "172.16.84.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.85.1/24",
+      "gateway": "172.16.85.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.86.1/24",
+      "gateway": "172.16.86.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.87.1/24",
+      "gateway": "172.16.87.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.54.1/24",
+      "gateway": "172.16.54.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "138.186.156.81/29",
+      "gateway": "138.186.156.80",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.10/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.11/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.12/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.13/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.14/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.15/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.130/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.16/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.53.1/24",
+      "gateway": "172.16.53.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.56.1/24",
+      "gateway": "172.16.56.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.48.1/24",
+      "gateway": "172.16.48.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.17/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.18/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.19/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.20/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.21/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.131/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.200/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.201/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.202/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.100/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.101/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.50/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.132/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.102/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "70.0.0.1/30",
+      "gateway": "70.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.51/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.54/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.53/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "25.0.0.1/30",
+      "gateway": "25.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.55/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.88.1/24",
+      "gateway": "172.16.88.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.88/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.89.1/24",
+      "gateway": "172.16.89.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.90.1/24",
+      "gateway": "172.16.90.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.64/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "30.0.0.1/30",
+      "gateway": "30.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "40.0.0.1/30",
+      "gateway": "40.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "50.0.0.1/30",
+      "gateway": "50.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "60.0.0.1/30",
+      "gateway": "60.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.91.1/24",
+      "gateway": "172.16.91.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.203/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.99/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "138.186.156.85/29",
+      "gateway": "138.186.156.80",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.92.1/24",
+      "gateway": "172.16.92.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.133/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.22/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.204/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.93.1/24",
+      "gateway": "172.16.93.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.200.1/24",
+      "gateway": "172.16.200.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.2/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.3/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.4/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.65/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.66/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.67/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.68/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.69/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.70/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.205/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.206/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.207/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.208/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.209/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.210/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.211/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "80.0.0.1/30",
+      "gateway": "80.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.201.1/24",
+      "gateway": "172.16.201.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.221/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.222/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.223/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.224/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "90.0.0.1/30",
+      "gateway": "90.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "100.0.0.1/30",
+      "gateway": "100.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "10.20.0.2/24",
+      "gateway": "10.20.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.225/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "192.168.3.1/24",
+      "gateway": "192.168.3.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.226/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.94.1/24",
+      "gateway": "172.16.94.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.95.1/24",
+      "gateway": "172.16.95.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.227/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.228/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.229/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.230/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "110.0.0.1/30",
+      "gateway": "110.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "21.0.0.1/30",
+      "gateway": "21.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.231/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.232/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.233/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.97.1/24",
+      "gateway": "172.16.97.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.98.1/24",
+      "gateway": "172.16.98.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.234/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.235/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.99.1/24",
+      "gateway": "172.16.99.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.96.1/24",
+      "gateway": "172.16.96.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "40.1.0.1/30",
+      "gateway": "40.1.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.237/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "111.0.0.1/30",
+      "gateway": "111.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "172.16.101.1/24",
+      "gateway": "172.16.101.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "112.0.0.1/30",
+      "gateway": "112.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "22.0.0.1/30",
+      "gateway": "22.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "23.0.0.1/30",
+      "gateway": "23.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "24.0.0.1/30",
+      "gateway": "24.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "192.0.0.1/30",
+      "gateway": "192.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.103/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.104/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.105/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "114.0.0.1/30",
+      "gateway": "114.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "108.0.0.1/30",
+      "gateway": "108.0.0.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.106/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.107/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.134/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.124/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.125/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.126/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.127/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.128/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    },
+    {
+      "network": "177.71.64.129/24",
+      "gateway": "177.71.64.0",
+      "interface": "N/A"
+    }
+  ],
+  "alerts": [
+    {
+      "type": "warning",
+      "message": "Mais de 37 VLANs configuradas",
+      "time": "2026-03-25T22:11:59.552563-03:00"
+    },
+    {
+      "type": "info",
+      "message": "Mais de 164 networks configurados",
+      "time": "2026-03-25T22:11:59.552563-03:00"
+    },
+    {
+      "type": "warning",
+      "message": "Mais de 50 pools DHCP configurados",
+      "time": "2026-03-25T22:11:59.552563-03:00"
+    },
+    {
+      "type": "danger",
+      "message": "1 usuário(s) >800 Mbps",
+      "time": "2026-03-25T22:11:59.552563-03:00"
+    }
+  ]
+}

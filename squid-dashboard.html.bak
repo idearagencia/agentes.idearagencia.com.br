@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Squid Proxy Analytics — DiegoHacks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #141414;
+      --card-bg: #1a1a1a;
+      --card-border: #333;
+      --text-main: #ffffff;
+      --text-sec: #A5A5A5;
+      --primary: #EC1D3A;
+      --accent: #00d4ff;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --danger: #ff4444;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Inter, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+    .header {
+      width: 100%;
+      background: var(--bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 20px 24px;	     
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo {
+      width: 48px; height: 48px;
+      background: var(--primary);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(236,29,58,0.3);
+    }
+    .title h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--text-main);
+    }
+    .title p {
+      font-size: 12px;
+      color: var(--text-sec);
+      margin-top: 4px;
+    }
+    .logout-btn {
+      background: rgba(236,29,58,0.12);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .logout-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-sec);
+      text-decoration: none;
+      font-size: 13px;
+      margin-bottom: 16px;
+      transition: color 0.2s ease;
+      padding-top: 10px;
+    }
+    .back-link:hover { color: var(--primary); }
+    .update-time {
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .update-time .server-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .update-time .update-label {
+      font-size: 11px;
+      color: var(--text-sec);
+      margin-left: 8px;
+    }
+
+    /* Grids */
+    .server-stats, .squid-stats, .tables-grid {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .server-stats { grid-template-columns: repeat(4, 1fr); }
+    .squid-stats { grid-template-columns: repeat(4, 1fr); }
+    .tables-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* Cards */
+    .server-card, .stat-card, .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .server-card {
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .server-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-sec);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .server-card-value {
+      font-family: Inter, -apple-system, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+    .server-card-sub {
+      font-size: 11px;
+      color: var(--text-sec);
+      margin-bottom: 12px;
+    }
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      margin-top: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: var(--percent, 0%);
+      background: var(--progress-color, var(--primary));
+      border-radius: 4px;
+      transition: width 0.5s ease, background 0.3s ease;
+    }
+
+    .stat-card {
+      text-align: center;
+    }
+    .stat-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-sec);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .stat-card-value {
+      font-family: Inter, -apple-system, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+    .stat-card-sub {
+      font-size: 11px;
+      color: var(--text-sec);
+    }
+
+    /* Tables */
+    .table-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+    }
+    thead {
+      background: rgba(255,255,255,0.03);
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-weight: 600;
+      color: var(--text-sec);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: var(--text-main);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(0,212,255,0.04); }
+
+    .badge-success {
+      background: rgba(0,255,136,0.15);
+      color: var(--success);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-warning {
+      background: rgba(255,170,0,0.15);
+      color: var(--warning);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-danger {
+      background: rgba(255,68,68,0.15);
+      color: var(--danger);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-success:hover, .badge-warning:hover, .badge-danger:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+
+    /* Alertas */
+    .alert-card {
+      margin-top: 30px;      
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .alert-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--warning);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .alert-list {
+      list-style: none;
+      font-size: 13px;
+      color: var(--text-sec);
+    }
+    .alert-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .alert-list li:last-child { border-bottom: none; }
+    .alert-icon { color: var(--warning); }
+
+    @media (max-width: 1200px) {
+      .server-stats, .squid-stats { grid-template-columns: repeat(2, 1fr); }
+      .tables-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .server-stats, .squid-stats { grid-template-columns: 1fr; }
+      .server-card-value, .stat-card-value { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <div class="logo">📡</div>
+        <div class="title">
+          <h1>Squid Proxy Analytics</h1>
+          <p>DiegoHacks · Infraestrutura</p>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="performLogout()">Sair</button>
+    </div>
+
+    <a href="/index.html" class="back-link">← Voltar ao Dashboard</a>
+
+    <div class="update-time" id="updateTime">
+      <span class="server-label">Servidor Proxy: 172.16.1.9</span>
+      <span class="update-label">• Atualizado: --</span>
+    </div>
+
+    <!-- Métricas do Servidor Proxy (Grid 5 colunas) -->
+    <div class="server-metrics-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px;">
+      
+      <!-- CPU Card (compacto) -->
+      <div class="metric-card" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.06);">
+        <div style="font-size:12px; font-weight:700; color:var(--text-sec); margin-bottom:8px; text-transform:uppercase;">💻 CPU</div>
+        <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:4px;">
+          <span id="cpu-usage">--</span>
+        </div>
+        <div style="font-size:11px; color:var(--text-sec); margin-bottom:8px;"><span id="cpu-cores">--</span> cores</div>
+        <div style="height:4px; background:rgba(255,107,157,0.1); border-radius:2px; overflow:hidden;">
+          <div id="cpu-bar" style="height:100%; width:0%; background:var(--primary); transition:width 0.3s;"></div>
+        </div>
+      </div>
+
+      <!-- Memória Card -->
+      <div class="metric-card" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.06);">
+        <div style="font-size:12px; font-weight:700; color:var(--text-sec); margin-bottom:8px; text-transform:uppercase;">🧠 Memória</div>
+        <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:4px;">
+          <span id="mem-used">--</span>
+        </div>
+        <div style="font-size:11px; color:var(--text-sec); margin-bottom:8px;">
+          <span id="mem-percent">--</span>% de <span id="mem-total">--</span>
+        </div>
+        <div style="height:4px; background:rgba(255,107,157,0.1); border-radius:2px; overflow:hidden;">
+          <div id="mem-bar" style="height:100%; width:0%; background:var(--primary); transition:width 0.3s;"></div>
+        </div>
+      </div>
+
+      <!-- Partições Linha 1 - slots na ordem: part2, part1, part6 -->
+      <div id="partitions-l1-1" style="display:none;"></div>
+      <div id="partitions-l1-2" style="display:none;"></div>
+      <div id="partitions-l1-3" style="display:none;"></div>
+
+      <!-- Status Card -->
+      <div class="metric-card" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.06); display:flex; flex-direction:column; justify-content:center;">
+        <div style="font-size:12px; font-weight:700; color:var(--text-sec); margin-bottom:8px; text-transform:uppercase;">📡 Status</div>
+        <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:4px;" id="proxy-status">
+          --<br><small style="font-size:11px; color:var(--text-sec);">carregando...</small>
+        </div>
+      </div>
+
+      <!-- Partições Linha 2 - slots na ordem: part4, part7, part3 -->
+      <div id="partitions-l2-1" style="display:none;"></div>
+      <div id="partitions-l2-2" style="display:none;"></div>
+      <div id="partitions-l2-3" style="display:none;"></div>
+
+    </div>
+
+    <!-- Separador -->
+    <div style="margin: 30px 0; padding-left: 24px; position: relative;">
+      <div style="position: absolute; top: 50%; left: 24px; right: 0; height: 1px; background: var(--card-border);"></div>
+      <div style="display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 16px; background: var(--bg); padding: 8px 20px; position: relative; border: 1px solid var(--card-border); border-radius: 20px;">
+        <span style="color: var(--text-main); font-size: 13px; font-weight: 800;">
+          Dados do Squid
+        </span>
+        <span style="font-size: 11px; color: var(--text-sec);">
+          Coletas: 08:30 • 09:30 • 11:00 • 13:00 • 14:30 • 16:00 • 19:00
+        </span>
+        <span id="squid-last-update" style="font-size: 10px; color: var(--text-sec); opacity: 0.8;">
+          Atualizado: --
+        </span>
+      </div>
+    </div>
+
+    <!-- Dados do Squid -->
+    <div class="squid-stats">
+      <div class="stat-card">
+        <div class="stat-card-title"> Requisições</div>
+        <div class="stat-card-value" id="totalRequests">816,430</div>
+        <div class="stat-card-sub">últimas 24h</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title"> Erros 4xx</div>
+        <div class="stat-card-value" id="total4xx" style="color: var(--warning);">812,943</div>
+        <div class="stat-card-sub">principalmente 407</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title"> Erros 5xx</div>
+        <div class="stat-card-value" id="total5xx" style="color: var(--danger);">130</div>
+        <div class="stat-card-sub">backend / ACL</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title"> Domínios Únicos</div>
+        <div class="stat-card-value" id="uniqueDomains">244</div>
+        <div class="stat-card-sub">24h</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title"> Usuários Únicos</div>
+        <div class="stat-card-value" id="uniqueUsers">24</div>
+        <div class="stat-card-sub">24h</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">⚡ Cache Hit Ratio</div>
+        <div class="stat-card-value" id="cacheHitRatio" style="color: var(--accent);">N/A</div>
+        <div class="stat-card-sub">otimizar cache</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title"> Req/s Atuais</div>
+        <div class="stat-card-value" id="reqPerSecond">342</div>
+        <div class="stat-card-sub">média 1h</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">🔗 Conexões Ativas</div>
+        <div class="stat-card-value" id="activeConnections">142</div>
+        <div class="stat-card-sub">TCP</div>
+      </div>
+    </div>
+
+    <!-- Tabelas -->
+    <div class="tables-grid">
+      <!-- Top Domínios -->
+      <div class="table-card">
+        <div class="table-title">🌐 Top 10 Domínios Acessados</div>
+        <table>
+          <thead><tr><th>Domínio</th><th>Acesso</th></tr></thead>
+          <tbody id="domainsTable">
+            <tr><td>ecs.office.com</td><td>808,887</td></tr>
+            <tr><td>download.windowsupdate.com</td><td>591</td></tr>
+            <tr><td>web.whatsapp.com</td><td>458</td></tr>
+            <tr><td>kv801.prod.do.dsp.mp.microsoft.com</td><td>450</td></tr>
+            <tr><td>optimizationguide-pa.googleapis.com</td><td>406</td></tr>
+            <tr><td>config.edge.skype.com</td><td>270</td></tr>
+            <tr><td>accounts.google.com</td><td>245</td></tr>
+            <tr><td>self.events.data.microsoft.com</td><td>210</td></tr>
+            <tr><td>waa-pa.clients6.google.com</td><td>189</td></tr>
+            <tr><td>disc601.prod.do.dsp.mp.microsoft.com</td><td>185</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Top Usuários por Tráfego -->
+      <div class="table-card">
+        <div class="table-title">👤 Top 10 Usuários por Tráfego</div>
+        <table>
+          <thead><tr><th>Usuário/IP</th><th>Tráfego</th></tr></thead>
+          <tbody id="usersTable">
+            <tr><td>evandro.santos</td><td>362.1 MB</td></tr>
+            <tr><td>eduarda.furtado</td><td>69.5 MB</td></tr>
+            <tr><td>defesac2</td><td>55.8 MB</td></tr>
+            <tr><td>osias.penha</td><td>26.1 MB</td></tr>
+            <tr><td>gabriel.alves</td><td>13.8 MB</td></tr>
+            <tr><td>raiane.severino</td><td>13.3 MB</td></tr>
+            <tr><td>alfredo.cunha</td><td>13.2 MB</td></tr>
+            <tr><td>rafael.ramos</td><td>13.1 MB</td></tr>
+            <tr><td>bruno.sousa</td><td>11.8 MB</td></tr>
+            <tr><td>juliana.chiesse</td><td>6.8 MB</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- IPs com Falhas 407 -->
+      <div class="table-card">
+        <div class="table-title">🔐 IPs com Falhas 407 (Top 15)</div>
+        <table>
+          <thead><tr><th>IP</th><th>Falhas</th></tr></thead>
+          <tbody id="auth407Table">
+            <tr><td>172.16.77.132</td><td><span class="badge-danger">450,451</span></td></tr>
+            <tr><td>172.16.49.106</td><td><span class="badge-danger">358,636</span></td></tr>
+            <tr><td>172.16.56.50</td><td><span class="badge-danger">565</span></td></tr>
+            <tr><td>172.16.49.98</td><td><span class="badge-danger">460</span></td></tr>
+            <tr><td>172.16.200.124</td><td><span class="badge-warning">318</span></td></tr>
+            <tr><td>172.16.49.117</td><td><span class="badge-warning">312</span></td></tr>
+            <tr><td>172.16.55.68</td><td><span class="badge-warning">271</span></td></tr>
+            <tr><td>172.16.76.36</td><td><span class="badge-warning">171</span></td></tr>
+            <tr><td>172.16.55.193</td><td><span class="badge-warning">154</span></td></tr>
+            <tr><td>172.16.50.86</td><td><span class="badge-warning">151</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Domínios Suspeitos -->
+      <div class="table-card">
+        <div class="table-title">⚠️ Domínios Suspeitos Detectados</div>
+        <table>
+          <thead><tr><th>Domínio/IP</th><th>Tipo</th></tr></thead>
+          <tbody id="suspiciousTable">
+            <tr><td>onedriveclucproddm20015.blob.core.windows.net</td><td><span class="badge-warning">Possível DGA</span></td></tr>
+            <tr><td>138.186.156.123</td><td><span class="badge-danger">Endereço IP</span></td></tr>
+            <tr><td>108.140.88.2</td><td><span class="badge-danger">Endereço IP</span></td></tr>
+            <tr><td>172.16.1.29</td><td><span class="badge-danger">Endereço IP</span></td></tr>
+            <tr><td>safebrowsingohttpgateway.googleapis.com</td><td><span class="badge-warning">Possível DGA</span></td></tr>
+            <tr><td>108.140.88.4</td><td><span class="badge-danger">Endereço IP</span></td></tr>
+            <tr><td>108.140.88.1</td><td><span class="badge-danger">Endereço IP</span></td></tr>
+            <tr><td>108.140.88.5</td><td><span class="badge-danger">Endereço IP</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+      <!-- Top Erros 500 -->
+      <div class="table-card">
+        <div class="table-title">🚨 Top 10 Erros 5xx (por código)</div>
+        <table>
+          <thead><tr><th>Código</th><th>Total</th><th>Descrição</th></tr></thead>
+          <tbody id="error500Table">
+            <tr><td><span class="badge-danger">502</span></td><td>68</td><td>Bad Gateway</td></tr>
+            <tr><td><span class="badge-danger">504</span></td><td>42</td><td>Gateway Timeout</td></tr>
+            <tr><td><span class="badge-danger">500</span></td><td>15</td><td>Internal Server Error</td></tr>
+            <tr><td><span class="badge-danger">503</span></td><td>5</td><td>Service Unavailable</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    <!-- Alertas e Recomendações -->
+    <div class="alert-card">
+      <div class="alert-title">💡 Recomendações</div>
+      <ul class="alert-list">
+        <li><span class="alert-icon">⚠️</span> Revisar IPs com muitas falhas 407 (configuração de autenticação)</li>
+        <li><span class="alert-icon">⚡</span> Otimizar cache se hit ratio baixo (aumentar memória, ajustar objetos)</li>
+        <li><span class="alert-icon">🔍</span> Investigar fontes de erros 5xx (backend, ACL)</li>
+        <li><span class="alert-icon">📈</span> Verificar usuários com tráfego excessivo (abuso)</li>
+        <li><span class="alert-icon">🌍</span> Analisar domínios mais acessados (uso adequado)</li>
+        <li><span class="alert-icon">🛡️</span> Ajustar ACLs se muitos CONNECTs não legítimos</li>
+        <li><span class="alert-icon">📊</span> Monitorar picos de RPS (capacidade)</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function performLogout() {
+      fetch('/api/logout', { method: 'POST' })
+        .then(() => window.location.href = '/');
+    }
+
+    function formatNumber(num) {
+      if (num === null || num === undefined) return 'N/A';
+      if (typeof num === 'number') {
+        return num.toLocaleString('pt-BR');
+      }
+      return num;
+    }
+
+    function updateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      document.querySelector('#updateTime .update-label').textContent = '• Atualizado: ' + timeStr;
+    }
+
+    async function loadSquidStats() {
+      try {
+        const res = await fetch('/squid-stats?' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        console.log('📊 Dados do Squid carregados:', data);
+        updateSquidDashboard(data);
+        updateTime();
+      } catch (e) {
+        console.warn('⚠️ Falha ao carregar stats do Squid:', e);
+      }
+    }
+    
+    function updateSquidDashboard(data) {
+      // Atualizar timestamp da última coleta
+      const lastUpdateElem = document.getElementById('squid-last-update');
+      if (data.last_updated) {
+        try {
+          const dt = new Date(data.last_updated);
+          const formatted = dt.toLocaleString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+          });
+          lastUpdateElem.textContent = 'Atualizado: ' + formatted;
+        } catch (e) {
+          lastUpdateElem.textContent = 'Atualizado: ' + data.last_updated;
+        }
+      } else {
+        lastUpdateElem.textContent = 'Atualizado: --';
+      }
+      
+      // Atualizar dados gerais (24h)
+      if (data.total_requests !== undefined) {
+        document.getElementById('totalRequests').textContent = formatNumber(data.total_requests);
+      }
+      if (data.status_4xx !== undefined) {
+        document.getElementById('total4xx').textContent = formatNumber(data.status_4xx);
+      }
+      if (data.status_5xx !== undefined) {
+        document.getElementById('total5xx').textContent = formatNumber(data.status_5xx);
+      }
+      if (data.unique_domains !== undefined) {
+        document.getElementById('uniqueDomains').textContent = formatNumber(data.unique_domains);
+      }
+      if (data.unique_users !== undefined) {
+        document.getElementById('uniqueUsers').textContent = formatNumber(data.unique_users);
+      }
+      
+      // Cache Hit Ratio
+      const cacheHitElem = document.getElementById('cacheHitRatio');
+      if (data.cache_hit_ratio !== undefined) {
+        cacheHitElem.textContent = (data.cache_hit_ratio * 100).toFixed(1) + '%';
+      } else {
+        cacheHitElem.textContent = 'N/A';
+      }
+      
+      // Req/s
+      if (data.req_per_second !== undefined) {
+        document.getElementById('reqPerSecond').textContent = formatNumber(data.req_per_second);
+      }
+      
+      // Top Domínios
+      if (data.top_domains && typeof data.top_domains === 'object') {
+        const tbody = document.getElementById('domainsTable');
+        tbody.innerHTML = '';
+        const sorted = Object.entries(data.top_domains)
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+        sorted.forEach(([domain, count]) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${domain}</td><td>${formatNumber(count)}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+      
+      // Top Usuários por Tráfego
+      if (data.top_users_bytes && Array.isArray(data.top_users_bytes)) {
+        const tbody = document.getElementById('usersTable');
+        tbody.innerHTML = '';
+        data.top_users_bytes
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10)
+          .forEach(([user, bytes]) => {
+            const mb = (bytes / (1024*1024)).toFixed(1);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${user}</td><td>${mb} MB</td>`;
+            tbody.appendChild(tr);
+          });
+      }
+      
+      // IPs com Falhas 407
+      if (data.auth_407_by_ip && typeof data.auth_407_by_ip === 'object') {
+        const tbody = document.getElementById('auth407Table');
+        tbody.innerHTML = '';
+        Object.entries(data.auth_407_by_ip)
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 15)
+          .forEach(([ip, count]) => {
+            const tr = document.createElement('tr');
+            const badgeClass = count > 1000 ? 'badge-danger' : count > 100 ? 'badge-warning' : 'badge-warning';
+            tr.innerHTML = `<td>${ip}</td><td><span class="${badgeClass}">${formatNumber(count)}</span></td>`;
+            tbody.appendChild(tr);
+          });
+      }
+      
+      // Domínios Suspeitos
+      if (data.suspicious && Array.isArray(data.suspicious)) {
+        const tbody = document.getElementById('suspiciousTable');
+        tbody.innerHTML = '';
+        data.suspicious.slice(0, 10).forEach(item => {
+          const tr = document.createElement('tr');
+          const badgeClass = item.reason.includes('IP') ? 'badge-danger' : 'badge-warning';
+          tr.innerHTML = `<td>${item.domain}</td><td><span class="${badgeClass}">${item.reason}</span></td>`;
+          tbody.appendChild(tr);
+        });
+      } else {
+        const tbody = document.getElementById('suspiciousTable');
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-sec);">Nenhum domínio suspeito detectado</td></tr>';
+      }
+      
+      // Erros 5xx (se disponível)
+      if (data.errors_5xx && typeof data.errors_5xx === 'object') {
+        const tbody = document.getElementById('error500Table');
+        tbody.innerHTML = '';
+        const sorted = Object.entries(data.errors_5xx)
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+        sorted.forEach(([code, count]) => {
+          const description = {
+            '500': 'Internal Server Error',
+            '502': 'Bad Gateway',
+            '503': 'Service Unavailable',
+            '504': 'Gateway Timeout'
+          }[code] || 'Unknown';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><span class="badge-danger">${code}</span></td><td>${formatNumber(count)}</td><td>${description}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+    
+    function formatNumber(num) {
+      if (num === null || num === undefined) return 'N/A';
+      if (typeof num === 'number') {
+        return num.toLocaleString('pt-BR');
+      }
+      return num;
+    }
+
+    function updateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      document.querySelector('#updateTime .update-label').textContent = '• Atualizado: ' + timeStr;
+    }
+
+    // Carregar métricas do servidor proxy (172.16.1.9)
+    async function loadProxyMetrics() {
+      console.log('loadProxyMetrics chamada');
+      try {
+        const res = await fetch('/proxy-metrics?' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        console.log('proxy data:', data);
+        
+        // Helper para cor da barra de progresso
+        function getProgressColor(percent) {
+          if (percent >= 100) return 'var(--danger)'; // vermelho
+          if (percent >= 50) return 'var(--warning)'; // amarelo
+          return 'var(--success)'; // verde
+        }
+        
+        // CPU - campos do InfraHacks: usage_percent, cores
+        const cpuUsage = data.cpu?.usage_percent || 0;
+        document.getElementById('cpu-usage').textContent = cpuUsage + '%';
+        document.getElementById('cpu-bar').style.setProperty('--percent', cpuUsage + '%');
+        document.getElementById('cpu-bar').style.background = getProgressColor(cpuUsage);
+        document.getElementById('cpu-cores').textContent = data.cpu?.cores || 4;
+        
+        // Memória - usado calculado se não existir
+        let memUsed, memPercent, memTotal;
+        if (data.memory?.percent !== undefined) {
+          memPercent = data.memory.percent;
+          memTotal = data.memory.total_gb ? data.memory.total_gb + 'Gi' : '15Gi';
+          // Calcular used se não existir
+          if (data.memory.used_gb !== undefined) {
+            memUsed = data.memory.used_gb + 'Gi';
+          } else {
+            const totalNum = parseFloat(memTotal) || 15;
+            memUsed = (totalNum * (memPercent/100)).toFixed(1) + 'Gi';
+          }
+        } else {
+          memUsed = '4.2Gi';
+          memPercent = 28.1;
+          memTotal = '15Gi';
+        }
+        document.getElementById('mem-used').textContent = memUsed;
+        document.getElementById('mem-percent').textContent = memPercent.toFixed(1);
+        document.getElementById('mem-total').textContent = memTotal;
+        document.getElementById('mem-bar').style.setProperty('--percent', memPercent + '%');
+        document.getElementById('mem-bar').style.background = getProgressColor(memPercent);
+        
+        // Status (online por padrão se não houver informação de falha)
+        const statusElem = document.getElementById('proxy-status');
+        // Se existir campo status e for 'offline', ou health indicar unhealthy
+        if (data.status === 'offline' || (data.health && data.health.overall === 'unhealthy')) {
+          statusElem.style.color = 'var(--danger)';
+          statusElem.innerHTML = '<span style="display:inline-block;width:8px;height:8px;background:var(--danger);border-radius:50%;animation:pulse 2s infinite;vertical-align:middle;margin-right:6px;"></span> Offline';
+        } else {
+          statusElem.style.color = 'var(--success)';
+          statusElem.innerHTML = '<span style="display:inline-block;width:8px;height:8px;background:var(--success);border-radius:50%;animation:pulse 2s infinite;vertical-align:middle;margin-right:6px;"></span> Online';
+        }
+        
+        // Partições do disco - distribuir em 6 posições com ordem específica
+        // Mapeamento: índice do array de partições -> slot
+        // Suposição: partições do array vêm em ordem: [sda1, sda2, sda3, sda4, sda5, sda6, sda7,...]
+        // Queremos na tela: Linha1: part2(sda2), part1(sda1), part6(sda6) | Linha2: part4(sda4), part7(sda7), part3(sda3)
+        const partitionOrder = [1, 0, 5, 3, 6, 2]; // índices no array para slots 0-5
+        const partitionSlots = [
+          'partitions-l1-1', 'partitions-l1-2', 'partitions-l1-3',
+          'partitions-l2-1', 'partitions-l2-2', 'partitions-l2-3'
+        ];
+        // Limpar todos os slots
+        partitionSlots.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.innerHTML = '';
+        });
+        
+        if (data.disk && Array.isArray(data.disk.partitions)) {
+          partitionOrder.forEach((arrayIdx, slotIdx) => {
+            const part = data.disk.partitions[arrayIdx];
+            if (!part) return;
+            
+            const slotId = partitionSlots[slotIdx];
+            const container = document.getElementById(slotId);
+            if (!container) return;
+            
+            container.style.display = 'block';
+            const card = document.createElement('div');
+            card.className = 'metric-card';
+            card.style.cssText = 'background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.06);';
+            const percentWidth = Math.min(part.percent, 100);
+            // Barra de progresso com cores: <50% verde, 50-99% amarelo, 100% vermelho
+            let progressColor = 'var(--success)'; // verde
+            if (part.percent >= 100) {
+              progressColor = 'var(--danger)'; // vermelho
+            } else if (part.percent >= 50) {
+              progressColor = 'var(--warning)'; // amarelo
+            }
+            card.innerHTML = `
+              <div style="font-size:12px; font-weight:700; color:var(--text-sec); margin-bottom:8px; text-transform:uppercase;">💾 ${part.filesystem}</div>
+              <div style="font-size:10px; color:var(--text-sec); margin-bottom:8px;">${part.mount}</div>
+              <div style="font-size:20px; font-weight:800; color:var(--text-main); margin-bottom:4px;">
+                ${part.used_gb}G / ${part.total_gb}G
+              </div>
+              <div style="font-size:11px; color:var(--text-sec); margin-bottom:8px;">${part.percent}% usado</div>
+              <div style="height:4px; background:rgba(255,107,157,0.1); border-radius:2px; overflow:hidden;">
+                <div style="height:100%; width:${percentWidth}%; background:${progressColor};"></div>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        } else {
+          // Sem partições, preencher primeiro slot com mensagem
+          const firstSlot = document.getElementById('partitions-l1-1');
+          if (firstSlot) {
+            firstSlot.style.display = 'block';
+            firstSlot.innerHTML = '<div class="metric-card" style="grid-column:1/-1; color:var(--text-sec); text-align:center;">Sem dados de partições</div>';
+          }
+        }
+        
+      } catch (e) {
+        console.warn('⚠️ Falha ao carregar métricas do proxy:', e);
+      }
+    }
+
+    // DOM já está pronto (script no final do body), chamar imediatamente
+    console.log('Script carregado, iniciando...');
+    loadSquidStats();
+    setInterval(loadSquidStats, 3600000); // a cada 1 hora
+    
+    loadProxyMetrics();
+    setInterval(loadProxyMetrics, 30000); // a cada 30 segundos
+  </script>
+</body>
+</html>

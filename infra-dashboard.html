@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfraHacks — Monitoramento Zabbix</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #EC1D3A;
+    --bg: #141414;
+    --card-bg: rgba(30, 30, 30, 0.8);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-main: #FFFFFF;
+    --text-muted: #A5A5A5;
+    --accent: #00d4ff;
+    --success: #00ff88;
+    --warning: #ffaa00;
+    --danger: #ff4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text-muted);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--card-border);
+    margin-bottom: 30px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .back-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(20px);
+  }
+
+  .card-title {
+    color: var(--text-main);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .metric:last-child {
+    border-bottom: none;
+  }
+
+  .metric-label {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-cpu { background: linear-gradient(90deg, var(--primary), var(--danger)); }
+  .progress-mem { background: linear-gradient(90deg, var(--accent), var(--success)); }
+  .progress-disk { background: linear-gradient(90deg, var(--warning), var(--primary)); }
+
+  .hosts-summary {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .summary-card {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .summary-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .summary-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .summary-card.ok .summary-value { color: var(--success); }
+  .summary-card.problem .summary-value { color: var(--danger); }
+  .summary-card.total .summary-value { color: var(--accent); }
+
+  .hosts-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(20px);
+  }
+
+  .host-list {
+    margin-top: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .host-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--accent);
+    transition: background 0.2s;
+  }
+
+  .host-item:hover {
+    background: rgba(255,255,255,0.06);
+  }
+
+  .host-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .host-name {
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .host-status {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .host-status.online {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--success);
+  }
+
+  .host-status.problem {
+    background: rgba(255, 68, 68, 0.2);
+    color: var(--danger);
+  }
+
+  .host-status.unknown {
+    background: rgba(255, 170, 0, 0.2);
+    color: var(--warning);
+  }
+
+  .last-update {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .refresh-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 12px 30px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(236, 29, 58, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .hosts-summary {
+      flex-direction: column;
+    }
+    .host-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .host-status {
+      align-self: flex-end;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon" style="width:40px;height:40px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;">🌐</div>
+      <h1>InfraHacks — Monitoramento</h1>
+    </div>
+    <a href="/" class="back-link">← Voltar</a>
+  </div>
+
+  <div class="container">
+    <div class="stats-grid">
+      <!-- CPU -->
+      <div class="card">
+        <div class="card-title">💻 CPU</div>
+        <div class="metric">
+          <span class="metric-label">Uso</span>
+          <span class="metric-value" id="cpu-value">--%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill progress-cpu" id="cpu-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Memória -->
+      <div class="card">
+        <div class="card-title">🧠 Memória</div>
+        <div class="metric">
+          <span class="metric-label">Usado / Total</span>
+          <span class="metric-value" id="mem-value">-- GB</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill progress-mem" id="mem-bar" style="width:0%"></div>
+        </div>
+        <div class="metric" style="margin-top:12px;">
+          <span class="metric-label">% Uso</span>
+          <span class="metric-value" id="mem-percent">--%</span>
+        </div>
+      </div>
+
+      <!-- Disco -->
+      <div class="card">
+        <div class="card-title">💾 Disco</div>
+        <div class="metric">
+          <span class="metric-label">Usado / Total</span>
+          <span class="metric-value" id="disk-value">-- GB</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill progress-disk" id="disk-bar" style="width:0%"></div>
+        </div>
+        <div class="metric" style="margin-top:12px;">
+          <span class="metric-label">% Uso</span>
+          <span class="metric-value" id="disk-percent">--%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hosts Summary -->
+    <div class="hosts-summary">
+      <div class="summary-card total">
+        <div class="summary-value" id="total-hosts">0</div>
+        <div class="summary-label">Total Hosts</div>
+      </div>
+      <div class="summary-card ok">
+        <div class="summary-value" id="online-hosts">0</div>
+        <div class="summary-label">Online</div>
+      </div>
+      <div class="summary-card problem">
+        <div class="summary-value" id="problem-hosts">0</div>
+        <div class="summary-label">Fora do Ar</div>
+      </div>
+    </div>
+
+    <!-- Hosts List -->
+    <div class="hosts-card">
+      <div class="card-title">📋 Hosts Monitorados</div>
+      <div class="host-list" id="host-list">
+        <div class="host-item">Carregando...</div>
+      </div>
+    </div>
+
+    <button class="refresh-btn" onclick="fetchZabbixData()">🔄 Atualizar Tudo</button>
+
+    <div class="last-update">
+      Última atualização: <span id="updated">--</span>
+    </div>
+  </div>
+
+<script>
+async function fetchZabbixData() {
+  try {
+    const res = await fetch('/api/zabbix-dashboard.php');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
+    // Atualizar métricas
+    const m = data.metrics;
+    document.getElementById('cpu-value').textContent = m.cpu + '%';
+    document.getElementById('cpu-bar').style.width = Math.min(m.cpu, 100) + '%';
+
+    document.getElementById('mem-value').textContent = m.memory.used + ' / ' + m.memory.total + ' GB';
+    document.getElementById('mem-percent').textContent = m.memory.percent + '%';
+    document.getElementById('mem-bar').style.width = Math.min(m.memory.percent, 100) + '%';
+
+    document.getElementById('disk-value').textContent = m.disk.used + ' / ' + m.disk.total + ' GB';
+    document.getElementById('disk-percent').textContent = m.disk.percent + '%';
+    document.getElementById('disk-bar').style.width = Math.min(m.disk.percent, 100) + '%';
+
+    // Atualizar hosts
+    const hostList = document.getElementById('host-list');
+    hostList.innerHTML = '';
+
+    if (data.hosts && data.hosts.length) {
+      data.hosts.forEach(host => {
+        const isProblem = host.status === 'problem';
+        const statusClass = isProblem ? 'problem' : 'online';
+        const statusText = isProblem ? '⚠️ Fora do Ar' : '✅ Online';
+
+        const item = document.createElement('div');
+        item.className = 'host-item';
+        item.innerHTML = `
+          <div class="host-info">
+            <span class="host-name">${host.name}</span>
+          </div>
+          <span class="host-status ${statusClass}">${statusText}</span>
+        `;
+        hostList.appendChild(item);
+      });
+    } else {
+      hostList.innerHTML = '<div class="host-item">Nenhum host encontrado</div>';
+    }
+
+    // Atualizar contadores
+    const s = data.summary;
+    document.getElementById('total-hosts').textContent = s.total;
+    document.getElementById('online-hosts').textContent = s.online;
+    document.getElementById('problem-hosts').textContent = s.problem;
+
+    document.getElementById('updated').textContent = new Date().toLocaleTimeString('pt-BR');
+
+  } catch (e) {
+    console.error('Erro ao carregar dados:', e);
+    document.getElementById('host-list').innerHTML = '<div class="host-item">Erro ao carregar dados</div>';
+  }
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  fetchZabbixData();
+  setInterval(fetchZabbixData, 30000); // Atualiza a cada 30 segundos
+});
+</script>
+</body>
+</html>

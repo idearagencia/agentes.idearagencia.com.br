@@ -1,0 +1,219 @@
+{
+  "generated": "2026-03-21T23:06:00Z",
+  "host": "srv857035",
+  "cpu": {
+    "usage": "0.0%",
+    "cores": 4
+  },
+  "memory": {
+    "total": "15Gi",
+    "used": "2.1Gi",
+    "free": "2.8Gi",
+    "percent": "13.7%"
+  },
+  "disk": {
+    "total": "197G",
+    "used": "30G",
+    "free": "159G",
+    "percent": "15.2%"
+  },
+  "agents": {
+    "DiegoHacks": {
+      "name": "DiegoHacks",
+      "role": "Agente Chefe (BOSS)",
+      "description": "Agente principal, coordenador de todos os outros. Especialista em troubleshooting, acesso a todas as memórias e controle geral do sistema.",
+      "skills": [
+        "Coordenador",
+        "Troubleshooting",
+        "Memória Total",
+        "Comunicação",
+        "Decisões Estratégicas",
+        "Orquestração de Agentes"
+      ],
+      "connections": [
+        "InfraHacks",
+        "WebHacks",
+        "CryptoHacks"
+      ],
+      "reports": [],
+      "tasksResolved": 8,
+      "lastActivity": "2026-03-21T23:06:00Z",
+      "status": "online"
+    },
+    "InfraHacks": {
+      "name": "InfraHacks",
+      "role": "Especialista em Infraestrutura de Redes",
+      "description": "Agente especializado em diagnóstico, segurança e otimização de infraestrutura de redes. Analisa logs, configura firewalls, DHCP, VPN, storage e monitora performance. Baseia-se em dados e evidências para recomendações.",
+      "skills": [
+        "RouterOS v6/v7 CLI",
+        "Firewall Filter & NAT Rules",
+        "DHCP Server & Relay",
+        "Hotspot & PPPoE/SSTP/L2TP",
+        "Queues & QoS (PCQ/Simple Queues)",
+        "BGP/OSPF Routing",
+        "WireGuard & IPsec VPN",
+        "Log Analysis & Scripting",
+        "Ubiquiti UniFi/EdgeRouter",
+        "Zabbix & Grafana Integration",
+        "Network Performance Tuning",
+        "Security Auditing & Hardening",
+        "Config Backup & Restore Automation",
+        "Squid Proxy Analysis",
+        "Traffic Shaping & Policing"
+      ],
+      "automatedTasks": [
+        "Análise de logs do Squid a cada 30 minutos",
+        "Coleta de métricas do servidor a cada minuto",
+        "Geração de alertas de segurança",
+        "Atualização de dashboards em tempo real"
+      ],
+      "reports": [
+        "Relatório de Tráfego Mensal - Março 2026",
+        "Relatório de Segurança - IPs Bloqueados",
+        "Relatório de Performance - Latência Média"
+      ],
+      "connections": [
+        "DiegoHacks"
+      ],
+      "tasksResolved": 3,
+      "lastActivity": "2026-03-21T22:25:00Z",
+      "status": "online"
+    },
+    "WebHacks": {
+      "name": "WebHacks",
+      "role": "Especialista em Web & Dashboards",
+      "description": "Especialista em criação de sites modernos, SEO, automação web e dashboards interativos. Foco em performance, minimalismo e conversão. Desenvolve interfaces profissionais com arquitetura escalável.",
+      "skills": [
+        "Design Minimalista",
+        "Performance Web (Lighthouse >90)",
+        "SEO Técnico (Core Web Vitals)",
+        "Schema Markup & Indexação",
+        "Automação Web (Scraping, APIs)",
+        "Frontend Moderno (React, Vue)",
+        "Dashboards Interativos (Grafana, Superset)",
+        "PWA & Mobile-First",
+        "Funis de Conversão",
+        "UX Writing & Acessibilidade"
+      ],
+      "connections": [
+        "DiegoHacks"
+      ],
+      "reports": [
+        "Relatório de Performance Web - Semanal",
+        "Relatório de SEO - Ranking Keywords"
+      ],
+      "tasksResolved": 2,
+      "lastActivity": "2026-03-21T22:24:00Z",
+      "status": "online"
+    },
+    "CryptoHacks": {
+      "name": "CryptoHacks",
+      "role": "Especialista em Crypto & DeFi Analytics",
+      "description": "Analista de criptoativos com foco em BTC, ETH, RWA, altcoins e memecoins. Monitora métricas on-chain (TVL, volume, APY), faz scouting de airdrops e cria dashboards de portfolio com alertas inteligentes.",
+      "skills": [
+        "On-Chain Analysis (TVL, Supply, Volume)",
+        "DeFi Protocol Review",
+        "Airdrop Hunting & Claim",
+        "Risk Assessment (Liquidity, Rug Pull)",
+        "Portfolio Tracking & Rebalancing",
+        "Yield Farming Strategies",
+        "DCA & Staking Optimization",
+        "Bridging & Cross-Chain",
+        "DefiLlama API Integration",
+        "Real-Time Metrics & Alerts"
+      ],
+      "connections": [
+        "DiegoHacks"
+      ],
+      "reports": [
+        "Relatório de Portfolio Crypto - Diário",
+        "Relatório de Airdrops Oportunidades - Semanal"
+      ],
+      "tasksResolved": 1,
+      "lastActivity": "2026-03-21T22:23:00Z",
+      "status": "online"
+    },
+    "CloudHacks": {
+      "name": "CloudHacks",
+      "role": "Especialista em Cloud & Infraestrutura",
+      "description": "Agente especializado em arquitetura de nuvem, multi-cloud, Kubernetes, IaC e automação de infraestrutura. Gerencia deployments, monitora custos, otimiza recursos e implementa soluções escaláveis e seguras.",
+      "skills": [
+        "AWS, GCP, Azure",
+        "Kubernetes & Docker",
+        "Terraform & Pulumi",
+        "CI/CD Pipelines",
+        "Serverless Architectures",
+        "Cloud Security & IAM",
+        "Cost Optimization",
+        "Monitoring (Prometheus, Grafana)",
+        "Infrastructure as Code",
+        "Auto-scaling & HA"
+      ],
+      "connections": [
+        "DiegoHacks"
+      ],
+      "reports": [
+        "Relatório de Custos Cloud - Mensal",
+        "Relatório de Segurança - IAM Policies",
+        "Relatório de Performance - Kubernetes Clusters"
+      ],
+      "tasksResolved": 0,
+      "lastActivity": "2026-03-22T15:45:00Z",
+      "status": "online"
+    },
+    "TermoHacks": {
+      "name": "TermoHacks",
+      "role": "Especialista em Termo de Referência de Barra Mansa/RJ",
+      "description": "Agente especializado na elaboração, análise e revisão de Termos de Referência para licitações e contratos públicos de Barra Mansa/RJ. Domina a legislação municipal, estadual e federal aplicável a processos de compras e contratações.",
+      "skills": [
+        "Elaboração de Termo de Referência",
+        "Lei 8666/93 e legislação municipal",
+        "Especificação técnica de bens/serviços",
+        "Pesquisa de preços e market analysis",
+        "Análise de editais",
+        "Elaboração de ETP/PMR",
+        "Gestão de contratações públicas",
+        "Metodologia de cálculo de valor estimado",
+        "Elaboração de TR para TIC",
+        "Consultoria em licitações"
+      ],
+      "connections": [
+        "DiegoHacks"
+      ],
+      "reports": [
+        "Relatório de Editais Analisados - Mensal",
+        "Relatório de Valores Estimados - Trimestral"
+      ],
+      "tasksResolved": 0,
+      "lastActivity": "2026-03-22T20:37:00Z",
+      "status": "online"
+    },
+    "RotacertaAi": {
+      "name": "RotacertaAi",
+      "role": "Agente de Rotação & Distribuição de Conteúdo",
+      "description": "Especialista em rotação de conteúdo, SEO dinâmico, distribuição multi-canal e automação de marketing. Otimiza a entrega de conteúdo para diferentes públicos e plataformas, maximizando alcance e engajamento.",
+      "skills": [
+        "Content Rotation Strategies",
+        "SEO Dinâmico (Rotação de Palavras-chave)",
+        "Distribuição Multi-canal (Social, Email, Blog)",
+        "Automação de Marketing (Zapier, Make)",
+        "A/B Testing & Optimization",
+        "Analytics & Performance Tracking",
+        "Content Repurposing",
+        "Schedule & Publishing Automation",
+        "Cross-platform Syndication",
+        "リスティング広告最適化"
+      ],
+      "connections": [
+        "DiegoHacks"
+      ],
+      "reports": [
+        "Relatório de Desempenho de Conteúdo - Semanal",
+        "Relatório de Distribuição - Mensal"
+      ],
+      "tasksResolved": 0,
+      "lastActivity": "2026-03-23T13:00:00Z",
+      "status": "online"
+    }
+  }
+}

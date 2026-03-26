@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DASHBOARD DE RELATÓRIOS — AgentOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+ --bg: #141414;
+ --card-bg: #1a1a1a;
+ --card-border: #333;
+ --text-main: #ffffff;
+ --text-sec: #A5A5A5;
+ --primary: #EC1D3A;
+ --accent: #00d4ff;
+ --success: #00ff88;
+ --warning: #ffaa00;
+ --danger: #ff4444;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+ font-family: Inter, -apple-system, sans-serif;
+ background: var(--bg);
+ color: var(--text-main);
+ min-height: 100vh;
+}
+.header {
+ background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+ border-bottom: 1px solid var(--card-border);
+ padding: 20px 24px;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 16px;
+}
+.logo {
+ width: 48px; height: 48px;
+ background: var(--primary);
+ border-radius: 12px;
+ display:flex; align-items:center; justify-content:center;
+ font-size: 24px;
+ box-shadow: 0 4px 12px rgba(236,29,58,0.3);
+}
+.title h1 {
+ font-size: 20px;
+ font-weight: 800;
+ letter-spacing: 1px;
+ color: var(--text-main);
+}
+.title p {
+ font-size: 12px;
+ color: var(--text-sec);
+ margin-top: 4px;
+}
+.logout-btn {
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ background: rgba(255,255,255,0.05);
+ border: 1px solid var(--card-border);
+ color: var(--text-main);
+ padding: 10px 16px;
+ border-radius: 8px;
+ font-size: 13px;
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.2s ease;
+ text-decoration: none;
+}
+.logout-btn:hover {
+ background: rgba(255,68,68,0.15);
+ border-color: var(--danger);
+ color: var(--danger);
+}
+.container {
+ max-width: 1600px;
+ margin: 0 auto;
+ padding: 24px;
+}
+.update-time {
+ text-align: right;
+ font-size: 11px;
+ color: var(--text-sec);
+ margin-bottom: 8px;
+}
+.stats-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+ gap: 20px;
+ margin-bottom: 32px;
+}
+.stat-card {
+ background: var(--card-bg);
+ border: 1px solid var(--card-border);
+ border-radius: 16px;
+ padding: 20px;
+ text-align: center;
+ position: relative;
+ overflow: hidden;
+ transition: all 0.3s ease;
+}
+.stat-card:hover {
+ transform: translateY(-4px);
+ border-color: var(--primary);
+ box-shadow: 0 16px 32px rgba(0,0,0,0.4);
+}
+.stat-card::before {
+ content: '';
+ position: absolute;
+ top: 0; left: 0; right: 0; height: 3px;
+ background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.stat-card-title {
+ font-size: 12px;
+ font-weight: 700;
+ text-transform: uppercase;
+ color: var(--text-sec);
+ margin-bottom: 12px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 8px;
+}
+.stat-card-value {
+ font-family: Inter, -apple-system, sans-serif;
+ font-size: 24px;
+ font-weight: 600;
+ color: var(--text-main);
+ margin-bottom: 4px;
+ letter-spacing: -0.02em;
+}
+.stat-card-sub {
+ font-size: 11px;
+ color: var(--text-sec);
+}
+.back-button {
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ background: transparent;
+ border: 1px solid var(--card-border);
+ color: var(--text-main);
+ padding: 10px 16px;
+ border-radius: 8px;
+ font-size: 13px;
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.2s ease;
+ text-decoration: none;
+ margin-bottom: 20px;
+}
+.back-button:hover {
+ background: rgba(255,255,255,0.05);
+ border-color: var(--primary);
+}
+.agent-section {
+ background: var(--card-bg);
+ border: 1px solid var(--card-border);
+ border-radius: 16px;
+ margin-bottom: 24px;
+ overflow: hidden;
+}
+.agent-header {
+ padding: 16px 20px;
+ background: rgba(236,29,58,0.08);
+ border-bottom: 1px solid var(--card-border);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ cursor: pointer;
+ transition: background 0.2s ease;
+}
+.agent-header:hover {
+ background: rgba(236,29,58,0.12);
+}
+.agent-header h3 {
+ font-size: 16px;
+ font-weight: 700;
+ color: var(--text-main);
+ margin: 0;
+ display: flex;
+ align-items: center;
+ gap: 10px;
+}
+.agent-count {
+ background: var(--primary);
+ color: white;
+ padding: 4px 10px;
+ border-radius: 12px;
+ font-size: 12px;
+ font-weight: 600;
+}
+.agent-reports {
+ padding: 0;
+}
+.agent-reports.hidden {
+ display: none;
+}
+.report-item {
+ padding: 14px 20px;
+ border-bottom: 1px solid var(--card-border);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ transition: background 0.2s ease;
+}
+.report-item:hover {
+ background: rgba(0,212,255,0.04);
+}
+.report-item:last-child {
+ border-bottom: none;
+}
+.report-info {
+ flex: 1;
+}
+.report-title {
+ font-size: 14px;
+ font-weight: 600;
+ color: var(--text-main);
+ margin-bottom: 4px;
+ cursor: pointer;
+ transition: color 0.2s ease;
+}
+.report-title:hover {
+ color: var(--accent);
+ text-decoration: underline;
+}
+.report-meta {
+ font-size: 11px;
+ color: var(--text-sec);
+ display: flex;
+ gap: 12px;
+ flex-wrap: wrap;
+}
+.report-meta span {
+ display: flex;
+ align-items: center;
+ gap: 4px;
+}
+.report-actions {
+ display: flex;
+ gap: 8px;
+}
+.report-btn {
+ display: inline-flex;
+ align-items: center;
+ gap: 6px;
+ background: rgba(0,212,255,0.12);
+ color: var(--accent);
+ border: 1px solid rgba(0,212,255,0.2);
+ padding: 8px 14px;
+ border-radius: 8px;
+ font-size: 12px;
+ font-weight: 600;
+ cursor: pointer;
+ text-decoration: none;
+ transition: all 0.2s ease;
+}
+.report-btn:hover {
+ background: rgba(0,212,255,0.2);
+ border-color: var(--accent);
+ box-shadow: 0 4px 12px rgba(0,212,255,0.15);
+}
+.footer {
+ text-align: center;
+ padding: 40px 20px;
+ border-top: 1px solid var(--card-border);
+ margin-top: 40px;
+ color: var(--text-sec);
+ font-size: 12px;
+}
+.footer a { color: var(--primary); text-decoration: none; }
+@keyframes fadeIn {
+ from { opacity: 0; transform: translateY(20px); }
+ to { opacity: 1; transform: translateY(0); }
+}
+.agent-section { animation: fadeIn 0.4s ease backwards; }
+.agent-section:nth-child(1) { animation-delay: 0.1s; }
+.agent-section:nth-child(2) { animation-delay: 0.2s; }
+.agent-section:nth-child(3) { animation-delay: 0.3s; }
+@media (max-width: 1024px) {
+ .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+ .stats-grid { grid-template-columns: 1fr; }
+ .agent-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+ .report-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+ .report-actions { width: 100%; justify-content: flex-end; }
+}
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">📊</div>
+    <div class="title">
+      <h1>DASHBOARD DE RELATÓRIOS</h1>
+      <p>Relatórios disponíveis — AgentOS</p>
+    </div>
+    <button class="logout-btn" onclick="performLogout()">🚪 Sair</button>
+  </header>
+  <main class="container">
+    <button class="back-button" onclick="history.back()">← Voltar ao Dashboard</button>
+    
+    <div class="update-time" id="update-time">Atualizado: --</div>
+    
+    <div class="stats-grid" id="stats-grid">
+      <!-- Cards de estatísticas -->
+    </div>
+    
+    <div id="agents-reports-container">
+      <!-- Seções por agente -->
+    </div>
+  </main>
+  <footer class="footer">
+    <p>© 2025 DiegoHacks — AgentOS v1.0 — Powered by OpenClaw</p>
+  </footer>
+
+<script>
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  if (bytes < 1024*1024*1024) return (bytes/(1024*1024)).toFixed(1) + ' MB';
+  return (bytes/(1024*1024*1024)).toFixed(2) + ' GB';
+}
+
+function formatDate(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleDateString('pt-BR', { 
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function toggleAgentSection(agentName) {
+  const safeName = agentName.replace(/\s/g, '-');
+  const section = document.getElementById(`agent-${safeName}`);
+  const reportsList = section.querySelector('.agent-reports');
+  const icon = section.querySelector('.expand-icon');
+  
+  if (reportsList.classList.contains('hidden')) {
+    reportsList.classList.remove('hidden');
+    icon.textContent = '▼';
+  } else {
+    reportsList.classList.add('hidden');
+    icon.textContent = '▶';
+  }
+}
+
+async function loadData() {
+  try {
+    const res = await fetch('/reports-list?' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const reports = await res.json();
+    
+    // Agrupar por agente
+    const byAgent = {};
+    reports.forEach(r => {
+      if (!byAgent[r.agent]) byAgent[r.agent] = [];
+      byAgent[r.agent].push(r);
+    });
+    
+    const totalReports = reports.length;
+    const agentCount = Object.keys(byAgent).length;
+    
+    // Atualizar estatísticas
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-card-title">📊 Total de Relatórios</div>
+        <div class="stat-card-value">${totalReports}</div>
+        <div class="stat-card-sub">disponíveis</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">📁 Agentes com Relatórios</div>
+        <div class="stat-card-value">${agentCount}</div>
+        <div class="stat-card-sub">no sistema</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">📅 Última Atualização</div>
+        <div class="stat-card-value">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+        <div class="stat-card-sub">agora</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">✅ Status</div>
+        <div class="stat-card-value" style="color: var(--success);">Online</div>
+        <div class="stat-card-sub">entrega ativa</div>
+      </div>
+    `;
+    
+    // Ordenar agentes alfabeticamente
+    const agentNames = Object.keys(byAgent).sort();
+    const container = document.getElementById('agents-reports-container');
+    container.innerHTML = '';
+    
+    agentNames.forEach((agentName, idx) => {
+      const agentReports = byAgent[agentName].sort((a,b) => new Date(b.modified) - new Date(a.modified));
+      
+      const section = document.createElement('div');
+      section.className = 'agent-section';
+      section.id = `agent-${agentName.replace(/\s/g, '-')}`;
+      section.style.animationDelay = `${(idx+1) * 0.1}s`;
+      
+      section.innerHTML = `
+        <div class="agent-header" onclick="toggleAgentSection('${agentName}')">
+          <h3>
+            <span class="expand-icon">▼</span>
+            ${agentName}
+          </h3>
+          <span class="agent-count">${agentReports.length} relatórios</span>
+        </div>
+        <div class="agent-reports">
+          ${agentReports.map((r, i) => `
+            <div class="report-item" style="animation-delay: ${i * 0.05}s">
+              <div class="report-info">
+                <div class="report-title" onclick="window.open('/reports/${r.filename}', '_blank')">
+                  📄 ${r.title}
+                </div>
+                <div class="report-meta">
+                  <span>📅 ${formatDate(r.modified)}</span>
+                  <span>📦 ${formatFileSize(r.size)}</span>
+                  <span>📕 PDF</span>
+                </div>
+              </div>
+              <div class="report-actions">
+                <a href="/reports/${r.filename}" target="_blank" class="report-btn" onclick="event.stopPropagation()">
+                  📥 Abrir
+                </a>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      container.appendChild(section);
+    });
+    
+    // Atualizar timestamp
+    const updateTime = document.getElementById('update-time');
+    updateTime.textContent = 'Atualizado: ' + new Date().toLocaleString('pt-BR', { 
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    
+  } catch (e) {
+    console.warn('⚠️ Falta ao carregar lista de relatórios:', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+
+// Logout function
+function performLogout() {
+  if (confirm('Deseja realmente sair?')) {
+    fetch('/api/logout', { method: 'POST', credentials: 'include' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '/login.html';
+        } else {
+          alert('Erro ao fazer logout');
+        }
+      })
+      .catch(() => alert('Erro de conexão'));
+  }
+}
+</script>
+</body>
+</html>

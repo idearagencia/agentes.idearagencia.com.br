@@ -1,0 +1,42 @@
+# Arquivos de configuração sensível
+auth/users.json
+auth/sessions.json
+.secrets/
+.env
+
+# Logs e dados temporários
+logs/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+unifi_data/
+infra_events/
+memory/
+
+# Arquivos de cache
+*.log
+*.tmp
+temp/
+
+# Backups
+*backup*.py
+*backup*.html
+*backup*.json
+.bak
+.old
+
+# Arquivos de sessão
+*.pid
+*.sock
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Credenciais e segredos
+*.pem
+*.key
+*.crt
+*.p12

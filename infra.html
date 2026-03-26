@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiegoHacks — Infraestrutura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#141414; --card:#1a1a1a; --border:#333; --text:#fff; --muted:#A5A5A5; --primary:#EC1D3A; --accent:#00d4ff; --success:#00ff88; --warning:#ffaa00; --danger:#ff4444; }
+    *{margin:0;padding:0;box-sizing:border-box} body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh} .header{background:linear-gradient(180deg,#1a1a1a,#141414);border-bottom:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:16px} .logo{width:48px;height:48px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px} .title h1{font-size:20px;font-weight:800} .title p{font-size:12px;color:var(--muted);margin-top:4px} .container{max-width:1200px;margin:0 auto;padding:24px} .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:13px;margin-bottom:16px} .back:hover{color:var(--primary)} .status{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px} .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center} .card h3{font-size:12px;color:var(--muted);margin-bottom:8px} .card .val{font-size:28px;font-weight:700} .card .sub{font-size:11px;color:var(--muted)} .section{margin-top:24px} .section h2{font-size:16px;margin-bottom:12px;color:var(--accent)} table{width:100%;border-collapse:collapse;margin-bottom:16px} th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);font-size:13px} th{color:var(--muted);font-size:11px;text-transform:uppercase} tr:hover td{background:rgba(255,255,255,0.02)} .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;text-transform:uppercase} .badge-success{background:rgba(0,255,136,0.2);color:var(--success)} .badge-warning{background:rgba(255,170,0,0.2);color:var(--warning)} .badge-danger{background:rgba(255,68,68,0.2);color:var(--danger)}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">📡</div>
+    <div class="title"><h1>Infraestrutura</h1><p>DiegoHacks · Monitoramento</p></div>
+    <button onclick="logout()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">Sair</button>
+  </div>
+  <div class="container">
+    <a href="/index.html" class="back">← Voltar</a>
+    <div class="update-time" id="time"></div>
+    <div class="status">
+      <div class="card"><h3>Host</h3><div class="val" id="host">-</div><div class="sub">servidor</div></div>
+      <div class="card"><h3>CPU</h3><div class="val" id="cpu">-</div><div class="sub">uso</div></div>
+      <div class="card"><h3>Memória</h3><div class="val" id="mem">-</div><div class="sub">usada</div></div>
+      <div class="card"><h3>Disco</h3><div class="val" id="disk">-</div><div class="sub">uso</div></div>
+    </div>
+    <div class="section">
+      <h2>Métricas do Sistema</h2>
+      <table id="metricsTable"><thead><tr><th>Métrica</th><th>Valor</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="section">
+      <h2>Alertas Recentes</h2>
+      <div id="alerts">Carregando...</div>
+    </div>
+  </div>
+<script>
+async function load() {
+  try {
+    const statsRes = await fetch('/infrastructure-events', { credentials:'include' });
+    if(statsRes.status===302){window.location.href='/login.html';return}
+    const stats = await statsRes.json();
+    document.getElementById('host').textContent = stats.host || 'srv857035';
+    if(stats.cpu) document.getElementById('cpu').textContent = stats.cpu.usage || '0%';
+    if(stats.memory) document.getElementById('mem').textContent = (stats.memory.used||0).toFixed(1)+'GB';
+    if(stats.disk) document.getElementById('disk').textContent = (stats.disk.percent||0)+'%';
+    const tbody = document.querySelector('#metricsTable tbody');
+    tbody.innerHTML = '';
+    Object.entries(stats).forEach(([k,v])=>{
+      if(typeof v === 'object') return;
+      tbody.innerHTML += `<tr><td>${k}</td><td>${v}</td></tr>`;
+    });
+    const alerts = stats.alerts || [];
+    const div = document.getElementById('alerts');
+    if(!alerts.length) div.innerHTML = '<div class="badge badge-success">Nenhum alerta</div>';
+    else div.innerHTML = alerts.slice(0,10).map(a=>`<div class="badge badge-warning">${a}</div>`).join('');
+    document.getElementById('time').textContent = 'Atualizado: '+new Date().toLocaleTimeString('pt-BR');
+  } catch(e) { console.error(e); }
+}
+function logout(){ fetch('/api/logout',{method:'POST',credentials:'include'}).then(()=>window.location.href='/login.html'); }
+load(); setInterval(load,30000);
+</script>
+</body>
+</html>

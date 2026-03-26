@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curso de Mágica — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+ --bg: #0a0a0f;
+ --card: #14141c;
+ --border: #2a2a3a;
+ --text: #ffffff;
+ --text-muted: #8888a0;
+ --accent: #9C27B0;
+ --accent-light: #E040FB;
+ --success: #00ff88;
+ --warning: #ffaa00;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+ font-family: Inter, sans-serif;
+ background: var(--bg);
+ color: var(--text);
+ min-height: 100vh;
+ padding: 24px;
+}
+.header {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ margin-bottom: 32px;
+}
+.logo {
+ width: 48px; height: 48px;
+ background: linear-gradient(135deg, var(--accent), var(--accent-light));
+ border-radius: 12px;
+ display:flex; align-items:center; justify-content:center;
+ font-size: 24px;
+ box-shadow: 0 4px 12px rgba(156,39,176,0.3);
+}
+.header .title {
+ flex: 1;
+ text-align: center;
+}
+.header h1 {
+ font-family: 'Playfair Display', serif;
+ font-size: 32px;
+ background: linear-gradient(90deg, var(--accent), var(--accent-light));
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ margin-bottom: 8px;
+}
+.header p {
+ color: var(--text-muted);
+ font-size: 14px;
+}
+.logout-btn {
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ background: rgba(255,255,255,0.05);
+ border: 1px solid var(--border);
+ color: var(--text);
+ padding: 10px 16px;
+ border-radius: 8px;
+ font-size: 13px;
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.2s ease;
+ text-decoration: none;
+}
+.logout-btn:hover {
+ background: rgba(255,68,68,0.15);
+ border-color: var(--danger);
+ color: var(--danger);
+}
+.stats {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+ gap: 16px;
+ margin-bottom: 32px;
+}
+.stat-card {
+ background: var(--card);
+ border: 1px solid var(--border);
+ border-radius: 12px;
+ padding: 20px;
+ text-align: center;
+}
+.stat-value {
+ font-size: 28px;
+ font-weight: 700;
+ color: var(--accent-light);
+ margin-bottom: 4px;
+}
+.stat-label {
+ font-size: 12px;
+ color: var(--text-muted);
+ text-transform: uppercase;
+ letter-spacing: 1px;
+}
+.modules {
+ background: var(--card);
+ border: 1px solid var(--border);
+ border-radius: 12px;
+ overflow: hidden;
+}
+.module {
+ padding: 16px 20px;
+ border-bottom: 1px solid var(--border);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+}
+.module:last-child {
+ border-bottom: none;
+}
+.module-info h3 {
+ font-size: 15px;
+ font-weight: 600;
+ margin-bottom: 4px;
+}
+.module-info p {
+ font-size: 12px;
+ color: var(--text-muted);
+}
+.module-status {
+ padding: 6px 12px;
+ border-radius: 20px;
+ font-size: 11px;
+ font-weight: 600;
+ background: rgba(0,255,136,0.12);
+ color: var(--success);
+}
+.module-status.incomplete {
+ background: rgba(255,170,0,0.12);
+ color: var(--warning);
+}
+.footer {
+ text-align: center;
+ margin-top: 40px;
+ color: var(--text-muted);
+ font-size: 12px;
+}
+@keyframes pulse {
+ 0%, 100% { opacity: 1; }
+ 50% { opacity: 0.7; }
+}
+.progress-bar {
+ height: 4px;
+ background: rgba(255,255,255,0.1);
+ border-radius: 2px;
+ margin-top: 8px;
+ overflow: hidden;
+}
+.progress-fill {
+ height: 100%;
+ background: linear-gradient(90deg, var(--accent), var(--accent-light));
+ border-radius: 2px;
+ transition: width 0.5s ease;
+}
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎩 Curso de Mágica</h1>
+    <p>Seu progresso na arte da ilusão</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card" onclick="openModulesModal('all')" style="cursor: pointer;">
+      <div class="stat-value">12</div>
+      <div class="stat-label">Módulos</div>
+    </div>
+    <div class="stat-card" onclick="openModulesModal('completed')" style="cursor: pointer;">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Concluídos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">42%</div>
+      <div class="stat-label">Progresso</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 42%;"></div>
+      </div>
+    </div>
+    <div class="stat-card" onclick="openModulesModal('pending')" style="cursor: pointer;">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Pendentes</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="font-size:14px;font-weight:600;color:var(--text-muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">📚 Módulos do Curso</div>
+
+  <div class="modules">
+    <div class="module">
+      <div class="module-info">
+        <h3>1. Introdução à Mágica</h3>
+        <p>Fundamentos, história e ética do mágico</p>
+      </div>
+      <span class="module-status">✅ Concluído</span>
+    </div>
+    <div class="module">
+      <div class="module-info">
+        <h3>2. Técnicas de Misemonta</h3>
+        <p>Distração, timing e controle da audiência</p>
+      </div>
+      <span class="module-status">✅ Concluído</span>
+    </div>
+    <div class="module">
+      <div class="module-info">
+        <h3>3. Cartas: 50 Truques Clássicos</h3>
+        <p>Manipulação básica e intermediária</p>
+      </div>
+      <span class="module-status">✅ Concluído</span>
+    </div>
+    <div class="module">
+      <div class="module-info">
+        <h3>4. Moedas: Conjuração e Sumiço</h3>
+        <p>Shell game, palming e transposições</p>
+      </div>
+      <span class="module-status">✅ Concluído</span>
+    </div>
+    <div class="module">
+      <div class="module-info">
+        <h3>5. Cordas e Manipulação</h3>
+        <p>Corte e restauração, nós mágicos</p>
+      </div>
+      <span class="module-status">✅ Concluído</span>
+    </div>
+    <div class="module">
+      <div class="module-info">
+        <h3>6. Mentalismo Básico</h3>
+        <p>Leitura fria, sugestão e influence</p>
+      </div>
+      <span class="module-status incomplete">⏳ Em andamento</span>
+    </div>
+    <div class="module">
+      <div class="module-info">
+        <h3>7. Magia com Objetos Cotidianos</h3>
+        <p>Canetas, chaves, celulares</p>
+      </div>
+      <span class="module-status incomplete">⏳ Em andamento</span>
+    </div>
+    <div class="module">
+      <div class="module-info">
+        <h3>8. Escapologia</h3>
+        <p>Princípios de escape e segurança</p>
+      </div>
+      <span class="module-status incomplete">⏳ Em andamento</span>
+    </div>
+  </div>
+
+  <!-- Modal de Módulos -->
+  <div id="modules-modal" class="modal-overlay" onclick="closeModulesModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="modal-title">Módulos do Curso</h2>
+        <button class="modal-close" onclick="closeModulesModal(event)">✕</button>
+      </div>
+      <div class="modal-body" id="modal-list">
+        <!-- Lista de módulos será inserida via JS -->
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>✨ Mantenha a prática diária. A mágica acontece nos detalhes.</p>
+  </div>
+
+  <script>
+    const modules = [
+      { title: '1. Introdução à Mágica', desc: 'Fundamentos, história e ética do mágico', status: 'completed' },
+      { title: '2. Técnicas de Misemonta', desc: 'Distração, timing e controle da audiência', status: 'completed' },
+      { title: '3. Cartas: 50 Truques Clássicos', desc: 'Manipulação básica e intermediária', status: 'completed' },
+      { title: '4. Moedas: Conjuração e Sumiço', desc: 'Shell game, palming e transposições', status: 'completed' },
+      { title: '5. Cordas e Manipulação', desc: 'Corte e restauração, nós mágicos', status: 'completed' },
+      { title: '6. Mentalismo Básico', desc: 'Leitura fria, sugestão e influence', status: 'pending' },
+      { title: '7. Magia com Objetos Cotidianos', desc: 'Canetas, chaves, celulares', status: 'pending' },
+      { title: '8. Escapologia', desc: 'Princípios de escape e segurança', status: 'pending' }
+    ];
+
+    function openModulesModal(filter) {
+      const modal = document.getElementById('modules-modal');
+      const list = document.getElementById('modal-list');
+      const title = document.getElementById('modal-title');
+      
+      let filtered = modules;
+      if (filter === 'completed') {
+        filtered = modules.filter(m => m.status === 'completed');
+        title.textContent = 'Módulos Concluídos';
+      } else if (filter === 'pending') {
+        filtered = modules.filter(m => m.status === 'pending');
+        title.textContent = 'Módulos Pendentes';
+      } else {
+        title.textContent = 'Todos os Módulos';
+      }
+      
+      list.innerHTML = filtered.map(m => `
+        <div class="modal-module">
+          <div class="modal-module-info">
+            <h4>${m.title}</h4>
+            <p>${m.desc}</p>
+          </div>
+          <span class="module-status ${m.status}">${m.status === 'completed' ? '✅ Concluído' : '⏳ Pendente'}</span>
+        </div>
+      `).join('');
+      
+      modal.style.display = 'flex';
+    }
+
+    function closeModulesModal(event) {
+      document.getElementById('modules-modal').style.display = 'none';
+    }
+
+    // Fechar com ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModulesModal(null);
+    });
+  // Logout function
+  function performLogout() {
+    if (confirm("Deseja realmente sair?")) {
+      fetch("/api/logout", { method: "POST", credentials: "include" })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = "/login.html";
+          } else {
+            alert("Erro ao fazer logout");
+          }
+        })
+        .catch(() => alert("Erro de conexão"));
+    }
+  }
+
+  </script>
+
+  <style>
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    .modal-close:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .modal-module {
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .modal-module:last-child {
+      margin-bottom: 0;
+    }
+    .modal-module-info h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .modal-module-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .module-status {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      background: rgba(0,255,136,0.12);
+      color: var(--success);
+      border: 1px solid rgba(0,255,136,0.2);
+    }
+    .module-status.incomplete {
+      background: rgba(255,170,0,0.12);
+      color: var(--warning);
+      border-color: rgba(255,170,0,0.2);
+    }
+    @media (max-width: 600px) {
+      .modal-content {
+        width: 95%;
+        max-height: 90vh;
+      }
+      .modal-module {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .module-status {
+        align-self: flex-end;
+      }
+    }
+  </style>
+</body>
+</html>
+<script>
+function performLogout() {
+  if (confirm('Deseja realmente sair?')) {
+    fetch('/api/logout', { method: 'POST', credentials: 'include' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '/login.html';
+        } else {
+          alert('Erro ao fazer logout');
+        }
+      })
+      .catch(() => alert('Erro de conexão'));
+  }
+}
+</script>
+</body>
+</html>
