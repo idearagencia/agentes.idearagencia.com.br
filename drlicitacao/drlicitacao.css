@@ -1,0 +1,318 @@
+/* Dr. Licitação – Design System Minimalista (Azul) */
+
+:root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-hover: #1a1a1a;
+    --border: #262626;
+    --text: #ffffff;
+    --text-muted: #a1a1aa;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-active: #1e40af;
+    --focus-ring: rgba(37, 99, 235, 0.3);
+    --danger: #ef4444;
+    --success: #22c55e;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* App container */
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+.header-info .badge {
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+/* Progress Bar */
+.progress-container {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px 12px;
+}
+.progress-track {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    position: relative;
+}
+.progress-track::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+}
+.step {
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    padding: 6px 12px 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 999px;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+}
+.step.active {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, 0.1);
+}
+.step.completed {
+    color: var(--success);
+    border-color: var(--success);
+}
+.progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Main Content */
+.main {
+    flex: 1;
+    padding: 32px 24px 80px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Step Panels */
+.step-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+.step-panel.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.step-panel h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.subtitle {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+/* Fields */
+.field {
+    margin-bottom: 24px;
+}
+.row {
+    display: flex;
+    gap: 16px;
+}
+.half {
+    flex: 1;
+}
+label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+small {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+.hint {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+}
+.note {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+/* Char count */
+.char-count {
+    float: right;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary {
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+.btn-primary:hover {
+    background: var(--primary-hover);
+}
+.btn-primary:active {
+    background: var(--primary-active);
+}
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: var(--text-muted);
+}
+
+/* Navigation */
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+/* Table */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+.items-table th,
+.items-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+.items-table th {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.items-table tbody tr:hover {
+    background: var(--surface-hover);
+}
+.items-table input,
+.items-table select {
+    padding: 8px 10px;
+    font-size: 0.875rem;
+}
+.items-table .item-total {
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main { padding: 24px 16px 60px; }
+    .row { flex-direction: column; gap: 0; }
+    .half { width: 100%; }
+    .header { padding: 12px 16px; }
+    .progress-container { padding: 12px 16px; }
+}

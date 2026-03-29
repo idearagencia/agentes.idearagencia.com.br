@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Curso de Mágica — Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -23,6 +24,9 @@ body {
  background: var(--bg);
  color: var(--text);
  min-height: 100vh;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 32px;
  padding: 24px;
 }
 .header {
@@ -56,7 +60,6 @@ body {
  color: var(--text-muted);
  font-size: 14px;
 }
-.logout-btn {
  display: inline-flex;
  align-items: center;
  gap: 8px;
@@ -71,7 +74,6 @@ body {
  transition: all 0.2s ease;
  text-decoration: none;
 }
-.logout-btn:hover {
  background: rgba(255,68,68,0.15);
  border-color: var(--danger);
  color: var(--danger);

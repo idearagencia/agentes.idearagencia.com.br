@@ -1,20 +1,20 @@
 {
-  "generated": "2026-03-26T10:13:02Z",
+  "generated": "2026-03-29T19:02:02Z",
   "host": "srv857035",
   "cpu": {
-    "usage": "60.0%",
+    "usage": "4.3%",
     "cores": 4
   },
   "memory": {
     "total": "15Gi",
-    "used": "3.0Gi",
-    "free": "287Mi",
-    "percent": "19.0%"
+    "used": "2.8Gi",
+    "free": "4.9Gi",
+    "percent": "17.8%"
   },
   "disk": {
     "total": "197G",
-    "used": "47G",
-    "free": "143G",
-    "percent": "23.6%"
+    "used": "50G",
+    "free": "140G",
+    "percent": "25.0%"
   }
 }

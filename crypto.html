@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CryptoHacks — DiegoHacks</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#141414;--card:#1a1a1a;--border:#333;--text:#fff;--muted:#A5A5A5;--accent:#00d4ff;--success:#00ff88;--warning:#ffaa00;--danger:#ff4444}
@@ -14,12 +15,11 @@
   <div class="header">
     <div class="logo">₿</div>
     <div class="title"><h1>CryptoHacks</h1><p>DiegoHacks · Análise DeFi & Cripto</p></div>
-    <button onclick="logout()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer">Sair</button>
+    <a href="/logout">Sair</a>
   </div>
   <div class="container">
     <a href="/index.html" class="back">← Voltar</a>
     <div class="empty">Dashboard CryptoHacks em construção.</div>
   </div>
-<script>function logout(){fetch('/api/logout',{method:'POST',credentials:'include'}).then(()=>window.location.href='/login.html');}</script>
 </body>
 </html>

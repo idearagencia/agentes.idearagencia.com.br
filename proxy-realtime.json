@@ -1,32 +1,32 @@
 {
-  "timestamp": "2026-03-26T07:13:02.018569",
+  "timestamp": "2026-03-29T16:02:02.314169",
   "host": "proxy-01",
   "cpu": {
-    "usage_percent": 1.2,
+    "usage_percent": 4.3,
     "cores": 12,
-    "load_1min": 0.15,
-    "load_5min": 0.04,
-    "load_15min": 0.01
+    "load_1min": 0.52,
+    "load_5min": 0.29,
+    "load_15min": 0.16
   },
   "memory": {
     "total_gb": 15.42,
-    "used_gb": 0.79,
-    "free_gb": 9.88,
-    "percent": 5.1
+    "used_gb": 0.77,
+    "free_gb": 7.3,
+    "percent": 5.0
   },
   "disk": {
     "total_gb": 410.4,
-    "used_gb": 26.1,
-    "free_gb": 364.2,
-    "percent": 6.4,
+    "used_gb": 22.1,
+    "free_gb": 368.2,
+    "percent": 5.4,
     "partitions": [
       {
         "filesystem": "/dev/sda3",
         "mount": "/",
         "total_gb": 46.0,
-        "used_gb": 10.0,
-        "free_gb": 34.0,
-        "percent": 23.0
+        "used_gb": 11.0,
+        "free_gb": 33.0,
+        "percent": 25.0
       },
       {
         "filesystem": "/dev/sda2",
@@ -64,18 +64,18 @@
         "filesystem": "/dev/sda5",
         "mount": "/var",
         "total_gb": 183.0,
-        "used_gb": 16.0,
-        "free_gb": 158.0,
-        "percent": 9.0
+        "used_gb": 11.0,
+        "free_gb": 163.0,
+        "percent": 7.0
       }
     ]
   },
   "squid": {
     "service_running": true,
     "port_open": true,
-    "active_connections": 203,
-    "process_count": 20
+    "active_connections": 121,
+    "process_count": 19
   },
-  "collected_at": "2026-03-26T07:13:02.040584",
+  "collected_at": "2026-03-29T16:02:02.332993",
   "status": "online"
 }

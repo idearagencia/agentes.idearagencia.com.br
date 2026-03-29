@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Licitação – Novo ETP/TR</title>
+    <link rel="stylesheet" href="drlicitacao.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <rect width="24" height="24" rx="6" fill="#2563eb"/>
+                    <path d="M7 7h10v1.5H7V7zm0 3.5h7v1.5H7v-1.5zm0 3.5h10v1.5H7v-1.5z" fill="white"/>
+                </svg>
+                <span>Dr. Licitação</span>
+            </div>
+            <div class="header-info">
+                <span class="badge">Lei 14.133/2021</span>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-track">
+                <div class="step" data-step="1">Identificação</div>
+                <div class="step" data-step="2">Necessidade</div>
+                <div class="step" data-step="3">Alternativas</div>
+                <div class="step" data-step="4">Custos</div>
+                <div class="step" data-step="5">Riscos</div>
+                <div class="step" data-step="6">Requisitos</div>
+                <div class="step" data-step="7">Finalizar</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-labels">
+                <span>Passo <span id="currentStep">1</span> de 7</span>
+                <span id="stepTitle">Identificação</span>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <main class="main">
+            <form id="form" onsubmit="return false;">
+                <!-- Step 1: Identificação -->
+                <section class="step-panel active" id="step1">
+                    <h2>Identificação da Contratação</h2>
+                    <p class="subtitle">Defina as informações básicas</p>
+
+                    <div class="field">
+                        <label for="objeto">Objeto da Contratação *</label>
+                        <input type="text" id="objeto" maxlength="500" required placeholder="Ex: Serviço de fornecimento de internet dedicada 10Gbps">
+                        <small>Máximo 500 caracteres</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="tipoObjeto">Tipo de Objeto *</label>
+                        <select id="tipoObjeto" required onchange="handleTipoObjetoChange()">
+                            <option value="">Selecione...</option>
+                            <option value="servico">Serviço</option>
+                            <option value="bem">Bem (Aquisição)</option>
+                            <option value="obra">Obra (em desenvolvimento)</option>
+                            <option value="servico_engenharia">Serviço de Engenharia (em desenvolvimento)</option>
+                        </select>
+                        <small id="tipoNota" class="note" style="display:none;"></small>
+                    </div>
+
+                    <div class="field">
+                        <label for="secretaria">Secretaria/Órgão Contratante *</label>
+                        <select id="secretaria" required>
+                            <option value="">Selecione...</option>
+                            <option value="Controladoria Geral do Município">Controladoria Geral</option>
+                            <option value="Gabinete da Vice-Prefeita">Gabinete da Vice-Prefeita</option>
+                            <option value="Gabinete do Prefeito">Gabinete do Prefeito</option>
+                            <option value="Procuradoria Geral do Município">Procuradoria Geral</option>
+                            <option value="Secretaria Municipal de Administração">Administração</option>
+                            <option value="Secretaria Municipal de Educação">Educação</option>
+                            <option value="Secretaria Municipal de Saúde">Saúde</option>
+                            <option value="Secretaria Municipal de Finanças">Finanças</option>
+                            <option value="Secretaria Municipal de Manutenção Urbana">Manutenção Urbana</option>
+                            <option value="Secretaria Municipal de Meio Ambiente">Meio Ambiente</option>
+                            <option value="Secretaria Municipal de Planejamento Urbano">Planejamento Urbano</option>
+                            <option value="Secretaria Municipal de Desenvolvimento Rural">Desenvolvimento Rural</option>
+                            <option value="Secretaria Municipal de Assistência Social">Assistência Social</option>
+                            <option value="Secretaria Municipal de Comunicação">Comunicação</option>
+                            <option value="Secretaria Municipal de Juventude, Esporte e Lazer">Juventude, Esporte e Lazer</option>
+                            <option value="Secretaria Municipal de Proteção Animal">Proteção Animal</option>
+                            <option value="Secretaria Municipal de Habitação">Habitação</option>
+                            <option value="Secretaria Municipal de Ordem Pública">Ordem Pública</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="field half">
+                            <label for="prazo">Prazo de Vigência (meses) *</label>
+                            <input type="number" id="prazo" min="1" max="120" required placeholder="Ex: 12">
+                        </div>
+                        <div class="field half">
+                            <label for="unidades">Unidades Atendidas</label>
+                            <input type="number" id="unidades" min="0" placeholder="Ex: 70">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="valorEstimado">Valor Estimado Mensal (R$) *</label>
+                        <input type="text" id="valorEstimado" readonly placeholder="Calculado a partir dos itens">
+                        <small id="valorHint">Adicione itens na tabela abaixo</small>
+                    </div>
+
+                    <!-- Tabela de Itens -->
+                    <div class="field" id="itensField">
+                        <div class="table-header">
+                            <label>Itens da Contratação</label>
+                            <button type="button" class="btn-secondary" onclick="addItem()">+ Adicionar Item</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="items-table" id="itemsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th style="width: 100px;">Qtd</th>
+                                        <th style="width: 130px;">Unidade</th>
+                                        <th style="width: 150px;">Valor Unit. (R$)</th>
+                                        <th style="width: 120px;">Total (R$)</th>
+                                        <th style="width: 50px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="hint">Adicione todos os itens. O valor estimado será calculado automaticamente.</small>
+                    </div>
+                </section>
+
+                <!-- Step 2: Necessidade -->
+                <section class="step-panel" id="step2">
+                    <h2>Necessidade e Justificativa</h2>
+                    <p class="subtitle">Descreva o problema e a razão da contratação</p>
+
+                    <div class="field">
+                        <label for="problema">Problema a ser resolvido *</label>
+                        <textarea id="problema" rows="5" maxlength="500" required placeholder="Descreva a situação atual e o problema identificado..."></textarea>
+                        <small><span class="char-count" data-for="problema">0/500</span></small>
+                    </div>
+
+                    <div class="field">
+                        <label for="justificativa">Justificativa da Contratação *</label>
+                        <textarea id="justificativa" rows="5" maxlength="500" required placeholder="Por que esta contratação é necessária? Qual interesse público atende?"></textarea>
+                        <small><span class="char-count" data-for="justificativa">0/500</span></small>
+                    </div>
+
+                    <div class="field">
+                        <label for="interessePublico">Interesse Público Atendido *</label>
+                        <textarea id="interessePublico" rows="4" maxlength="500" required placeholder="Qual interesse público será atendido com esta contratação?"></textarea>
+                        <small><span class="char-count" data-for="interessePublico">0/500</span></small>
+                    </div>
+                </section>
+
+                <!-- Step 3: Alternativas -->
+                <section class="step-panel" id="step3">
+                    <h2>Alternativas e Solução</h2>
+                    <p class="subtitle">Liste as opções analisadas e justifique a escolha</p>
+
+                    <div class="field">
+                        <label>Alternativas Consideradas (mínimo 2) *</label>
+                        <div id="alternativesList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
+                        <button type="button" class="btn-secondary" onclick="addAlternative()">+ Adicionar Alternativa</button>
+                        <small>Descreva as soluções possíveis estudadas</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="justificativaEscolha">Justificativa da Solução Escolhida *</label>
+                        <textarea id="justificativaEscolha" rows="5" maxlength="500" required placeholder="Por que esta solução foi escolhida em relação às alternativas?"></textarea>
+                        <small><span class="char-count" data-for="justificativaEscolha">0/500</span></small>
+                    </div>
+                </section>
+
+                <!-- Step 4: Custos -->
+                <section class="step-panel" id="step4">
+                    <h2>Estimativa de Custos</h2>
+                    <p class="subtitle">Como foi realizada a pesquisa de preços</p>
+
+                    <div class="field">
+                        <label for="metodoPesquisa">Método de Pesquisa de Preços *</label>
+                        <select id="metodoPesquisa" required>
+                            <option value="">Selecione...</option>
+                            <option value="painel">Painel de Preços (PNCP)</option>
+                            <option value="contratacoes_anteriores">Contratações Anteriores</option>
+                            <option value="cotacao">Cotação com Fornecedores (mínimo 3)</option>
+                            <option value="tabelas">Tabelas de Referência</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="documentosPreco">Documentos de Suporte</label>
+                        <textarea id="documentosPreco" rows="4" maxlength="500" placeholder="Descreva os documentos utilizados (orçamentos, tabelas, etc)"></textarea>
+                        <small><span class="char-count" data-for="documentosPreco">0/500</span></small>
+                    </div>
+
+                    <div class="field">
+                        <label for="comentariosCusto">Comentários sobre Custos</label>
+                        <textarea id="comentariosCusto" rows="4" maxlength="500" placeholder="Observações sobre a formação de preço, variações, etc"></textarea>
+                        <small><span class="char-count" data-for="comentariosCusto">0/500</span></small>
+                    </div>
+                </section>
+
+                <!-- Step 5: Riscos -->
+                <section class="step-panel" id="step5">
+                    <h2>Riscos e Benefícios</h2>
+                    <p class="subtitle">Avaliação de riscos e benefícios esperados</p>
+
+                    <div class="field">
+                        <label>Riscos Principais</label>
+                        <div id="risksList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
+                        <button type="button" class="btn-secondary" onclick="addRisk()">+ Adicionar Risco</button>
+                        <small>Identifique riscos e suas mitigações</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="beneficios">Benefícios Esperados *</label>
+                        <textarea id="beneficios" rows="4" maxlength="500" required placeholder="Quais benefícios a contratação trará?"></textarea>
+                        <small><span class="char-count" data-for="beneficios">0/500</span></small>
+                    </div>
+
+                    <div class="field">
+                        <label for="impactosAmbientais">Impactos Ambientais</label>
+                        <textarea id="impactosAmbientais" rows="4" maxlength="500" placeholder="Há impactos ambientais? Descreva"></textarea>
+                        <small><span class="char-count" data-for="impactosAmbientais">0/500</span></small>
+                    </div>
+                </section>
+
+                <!-- Step 6: Requisitos -->
+                <section class="step-panel" id="step6">
+                    <h2>Requisitos Técnicos</h2>
+                    <p class="subtitle">Especificações técnicas e qualificação</p>
+
+                    <div class="field">
+                        <label for="requisitosTecnicos">Requisitos Técnicos *</label>
+                        <textarea id="requisitosTecnicos" rows="6" maxlength="1000" required placeholder="Descreva as especificações técnicas necessárias, incluindo normas, padrões, desempenho esperado, etc."></textarea>
+                        <small><span class="char-count" data-for="requisitosTecnicos">0/1000</span></small>
+                    </div>
+
+                    <div class="field">
+                        <label for="requisitosQualificacao">Requisitos de Qualificação</label>
+                        <textarea id="requisitosQualificacao" rows="4" maxlength="500" placeholder="Experiência, capacitação técnica, atestados, etc."></textarea>
+                        <small><span class="char-count" data-for="requisitosQualificacao">0/500</span></small>
+                    </div>
+                </section>
+
+                <!-- Step 7: Finalizar -->
+                <section class="step-panel" id="step7">
+                    <h2>Finalização</h2>
+                    <p class="subtitle">Informações finais e geração do documento</p>
+
+                    <div class="row">
+                        <div class="field half">
+                            <label for="parcelamento">Parcelamento</label>
+                            <select id="parcelamento" onchange="document.getElementById('justificativaParcelamentoField').style.display = this.value === 'sim' ? 'block' : 'none'">
+                                <option value="sim">Sim, permite parcelamento</option>
+                                <option value="nao">Não, pagamento único</option>
+                            </select>
+                        </div>
+                        <div class="field half">
+                            <label for="contratacoesCorrelatas">Contratações Correlatas</label>
+                            <input type="text" id="contratacoesCorrelatas" placeholder="Ex: SIM, CONTRATO Nº 123/2024">
+                        </div>
+                    </div>
+
+                    <div class="field" id="justificativaParcelamentoField" style="display:none;">
+                        <label for="justificativaParcelamento">Justificativa do Parcelamento</label>
+                        <textarea id="justificativaParcelamento" rows="3" maxlength="500" placeholder="Justifique o parcelamento, se aplicável"></textarea>
+                        <small><span class="char-count" data-for="justificativaParcelamento">0/500</span></small>
+                    </div>
+
+                    <div class="field">
+                        <label for="providencias">Providências para Contratação</label>
+                        <textarea id="providencias" rows="4" maxlength="500" placeholder="Ações necessárias antes da contratação (ex: designação de gestor, elaboração de edital, etc)"></textarea>
+                        <small><span class="char-count" data-for="providencias">0/500</span></small>
+                    </div>
+
+                    <div class="row">
+                        <div class="field half">
+                            <label for="responsavelElaboracao">Responsável pela Elaboração *</label>
+                            <input type="text" id="responsavelElaboracao" required placeholder="Nome completo">
+                        </div>
+                        <div class="field half">
+                            <label for="responsavelAprovacao">Responsável pela Aprovação *</label>
+                            <input type="text" id="responsavelAprovacao" required placeholder="Nome completo">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Navigation -->
+                <div class="nav-buttons">
+                    <button type="button" class="btn-secondary" id="prevBtn" onclick="changeStep(-1)" disabled>Voltar</button>
+                    <button type="button" class="btn-primary" id="nextBtn" onclick="changeStep(1)">Próximo</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script src="drlicitacao.js"></script>
+</body>
+</html>

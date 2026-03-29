@@ -1,222 +1,222 @@
 {
-  "total_requests": 346827,
-  "status_4xx": 341684,
-  "status_5xx": 161,
-  "unique_users": 61,
-  "unique_domains": 277,
+  "total_requests": 499917,
+  "status_4xx": 467474,
+  "status_5xx": 279,
+  "unique_users": 522,
+  "unique_domains": 2825,
   "top_domains": {
-    "ecs.office.com": 330838,
-    "web.whatsapp.com": 1878,
-    "download.windowsupdate.com": 1031,
-    "optimizationguide-pa.googleapis.com": 797,
-    "watson.events.data.microsoft.com": 729,
-    "kv801.prod.do.dsp.mp.microsoft.com": 627,
-    "config.edge.skype.com": 460,
-    "accounts.google.com": 442,
-    "settings-win.data.microsoft.com": 370,
-    "self.events.data.microsoft.com": 358
+    "ecs.office.com": 445655,
+    "web.whatsapp.com": 2068,
+    "assets.msn.com": 1939,
+    "www.google.com": 1644,
+    "odc.officeapps.live.com": 1123,
+    "ssl.gstatic.com": 1014,
+    "g.live.com": 970,
+    "optimizationguide-pa.googleapis.com": 963,
+    "mtalk.google.com": 944,
+    "www.bing.com": 868
   },
   "top_users_bytes": [
     [
+      "beatriz.rios",
+      698953437
+    ],
+    [
+      "paulo.dimas",
+      542831241
+    ],
+    [
+      "gabriel.ozawa",
+      375681771
+    ],
+    [
+      "cilone.oliveira",
+      366720405
+    ],
+    [
       "eduarda.furtado",
-      45618333
-    ],
-    [
-      "adriana.cristina",
-      26707966
-    ],
-    [
-      "gabriel.alves",
-      24811283
-    ],
-    [
-      "osias.penha",
-      23507445
-    ],
-    [
-      "thaiani.nazare",
-      16891613
+      315158581
     ],
     [
       "bruno.correa",
-      9796701
+      306820393
     ],
     [
-      "marcelandia.silva",
-      6823482
+      "tania.oliveira",
+      296803313
     ],
     [
-      "solon.veiga",
-      6753648
+      "sara.soares",
+      276761060
     ],
     [
-      "evandro.santos",
-      5678586
+      "rogerio.araujo",
+      178749413
     ],
     [
-      "larissa.barros",
-      3951428
+      "marcella.brasil",
+      171725512
     ]
   ],
   "auth_407_by_ip": {
-    "172.16.77.132": 112671,
-    "172.16.54.79": 1025,
-    "172.16.56.50": 942,
-    "172.16.56.71": 863,
-    "172.16.92.151": 691,
-    "172.16.49.117": 616,
-    "172.16.49.98": 602,
-    "172.16.200.124": 587,
-    "172.16.92.85": 411,
-    "172.16.54.75": 385,
-    "172.16.49.202": 360,
-    "172.16.88.167": 256,
-    "172.16.88.143": 255,
-    "172.16.52.125": 251,
-    "172.16.56.20": 224
+    "177.71.64.10": 99013,
+    "172.16.76.53": 80234,
+    "172.16.76.66": 71519,
+    "172.16.76.106": 57149,
+    "172.16.65.80": 54962,
+    "172.16.49.129": 35665,
+    "172.16.76.21": 27898,
+    "172.16.77.132": 13555,
+    "172.16.65.120": 6222,
+    "172.16.49.161": 455,
+    "172.16.50.116": 375,
+    "177.71.64.14": 352,
+    "172.16.65.48": 306,
+    "172.16.52.101": 268,
+    "172.40.201.40": 246
   },
   "suspicious": [
     {
-      "domain": "kv801.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.55.193",
-      "url": "kv801.prod.do.dsp.mp.microsoft.com:443",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "kv801.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.55.193",
-      "url": "kv801.prod.do.dsp.mp.microsoft.com:443",
+      "domain": "atendimentosmf.barramansa.rj.gov.br",
+      "ip": "172.16.50.203",
+      "url": "atendimentosmf.barramansa.rj.gov.br:443",
       "status": 200,
       "reason": "Possível DGA"
     },
     {
-      "domain": "kv801.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.55.193",
-      "url": "kv801.prod.do.dsp.mp.microsoft.com:443",
+      "domain": "login.microsoftonline.com",
+      "ip": "172.16.65.5",
+      "url": "login.microsoftonline.com:443",
       "status": 407,
       "reason": "Possível DGA"
     },
     {
-      "domain": "kv801.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.55.193",
-      "url": "kv801.prod.do.dsp.mp.microsoft.com:443",
+      "domain": "fd.api.iris.microsoft.com",
+      "ip": "172.16.49.221",
+      "url": "fd.api.iris.microsoft.com:443",
       "status": 200,
       "reason": "Possível DGA"
     },
     {
-      "domain": "v10.events.data.microsoft.com",
-      "ip": "177.71.64.10",
-      "url": "v10.events.data.microsoft.com:443",
-      "status": 403,
+      "domain": "horizon-track.globo.com",
+      "ip": "172.16.65.178",
+      "url": "horizon-track.globo.com:443",
+      "status": 200,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "ipv6.msftconnecttest.com",
+      "ip": "172.16.88.130",
+      "url": "http://ipv6.msftconnecttest.com/connecttest.txt",
+      "status": 503,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "www.msftconnecttest.com",
+      "ip": "172.16.88.130",
+      "url": "http://www.msftconnecttest.com/connecttest.txt",
+      "status": 200,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "108.140.88.3",
+      "ip": "172.16.65.5",
+      "url": "http://108.140.88.3/c/msdownload/update/software/defu/2026/03/updateplatform.amd64fre_a94fdbcbdd69a5cab6032175a4be11f9a52db59f.exe?",
+      "status": 407,
+      "reason": "Endereço IP"
+    },
+    {
+      "domain": "login.microsoftonline.com",
+      "ip": "172.16.50.41",
+      "url": "login.microsoftonline.com:443",
+      "status": 407,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "array815.prod.do.dsp.mp.microsoft.com",
+      "ip": "172.16.88.132",
+      "url": "array815.prod.do.dsp.mp.microsoft.com:443",
+      "status": 200,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "self.events.data.microsoft.com",
+      "ip": "172.16.200.124",
+      "url": "self.events.data.microsoft.com:443",
+      "status": 200,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "login.microsoftonline.com",
+      "ip": "172.16.49.186",
+      "url": "login.microsoftonline.com:443",
+      "status": 407,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "login.microsoftonline.com",
+      "ip": "172.16.65.5",
+      "url": "login.microsoftonline.com:443",
+      "status": 200,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "login.microsoftonline.com",
+      "ip": "172.16.88.132",
+      "url": "login.microsoftonline.com:443",
+      "status": 407,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "atendimentosmf.barramansa.rj.gov.br",
+      "ip": "172.16.50.203",
+      "url": "atendimentosmf.barramansa.rj.gov.br:443",
+      "status": 200,
+      "reason": "Possível DGA"
+    },
+    {
+      "domain": "atendimentosmf.barramansa.rj.gov.br",
+      "ip": "172.16.50.203",
+      "url": "atendimentosmf.barramansa.rj.gov.br:443",
+      "status": 200,
       "reason": "Possível DGA"
     },
     {
       "domain": "array802.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.49.202",
+      "ip": "172.16.49.117",
       "url": "array802.prod.do.dsp.mp.microsoft.com:443",
       "status": 200,
       "reason": "Possível DGA"
     },
     {
-      "domain": "disc601.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.200.124",
-      "url": "disc601.prod.do.dsp.mp.microsoft.com:443",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "self.events.data.microsoft.com",
-      "ip": "172.16.56.156",
-      "url": "self.events.data.microsoft.com:443",
+      "domain": "ctldl.windowsupdate.com",
+      "ip": "172.16.56.223",
+      "url": "http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab?",
       "status": 407,
       "reason": "Possível DGA"
     },
     {
       "domain": "config.edge.skype.com",
-      "ip": "172.16.49.186",
+      "ip": "172.16.49.98",
       "url": "config.edge.skype.com:443",
       "status": 407,
       "reason": "Possível DGA"
     },
     {
-      "domain": "disc801.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.54.79",
-      "url": "disc801.prod.do.dsp.mp.microsoft.com:443",
-      "status": 407,
+      "domain": "atendimentosmf.barramansa.rj.gov.br",
+      "ip": "172.16.50.203",
+      "url": "atendimentosmf.barramansa.rj.gov.br:443",
+      "status": 200,
       "reason": "Possível DGA"
     },
     {
       "domain": "v10.events.data.microsoft.com",
-      "ip": "172.16.50.86",
+      "ip": "172.16.54.141",
       "url": "v10.events.data.microsoft.com:443",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "disc801.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.54.79",
-      "url": "disc801.prod.do.dsp.mp.microsoft.com:443",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "detectportal.firefox.com",
-      "ip": "172.16.88.167",
-      "url": "http://detectportal.firefox.com/canonical.html",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "self.adblockultimate.net",
-      "ip": "172.16.50.118",
-      "url": "self.adblockultimate.net:443",
-      "status": 503,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "self.events.data.microsoft.com",
-      "ip": "172.16.49.98",
-      "url": "self.events.data.microsoft.com:443",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "disc501.prod.do.dsp.mp.microsoft.com",
-      "ip": "172.16.92.85",
-      "url": "disc501.prod.do.dsp.mp.microsoft.com:443",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "detectportal.firefox.com",
-      "ip": "172.16.88.167",
-      "url": "http://detectportal.firefox.com/canonical.html",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "detectportal.firefox.com",
-      "ip": "172.16.88.167",
-      "url": "http://detectportal.firefox.com/canonical.html",
-      "status": 407,
-      "reason": "Possível DGA"
-    },
-    {
-      "domain": "138.186.156.123",
-      "ip": "172.16.49.98",
-      "url": "138.186.156.123:443",
       "status": 200,
-      "reason": "Endereço IP"
-    },
-    {
-      "domain": "tlu.dl.delivery.mp.microsoft.com",
-      "ip": "172.16.56.50",
-      "url": "http://tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/a3c0a333-fa35-4b06-aa73-0639d5d0a68a?",
-      "status": 407,
       "reason": "Possível DGA"
     }
   ],
-  "req_per_second": 4.01,
-  "last_updated": "2026-03-25T19:30:24.768332-03:00"
+  "req_per_second": 5.79,
+  "last_updated": "2026-03-26T19:30:34.440600-03:00"
 }

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Licitação – Assessor Técnico em Contratação Pública</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #141414;
+            --text: #ffffff;
+            --text-muted: #a5a5a5;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent: #60a5fa;
+            --border: #262626;
+            --radius: 16px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px;
+        }
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 0;
+            text-align: center;
+        }
+        .hero h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 60px 0;
+        }
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: left;
+        }
+        .feature-card h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 1.125rem;
+        }
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+        }
+        .requirements {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin: 60px 0;
+            text-align: left;
+        }
+        .requirements h3 {
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+        .requirements ul {
+            list-style: none;
+        }
+        .requirements li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+        }
+        .requirements li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .cta-bottom {
+            text-align: center;
+            margin: 60px 0 120px;
+        }
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">DL</div>
+                <h1>Dr. Licitação</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Gere ETP e Termo de Referência<br>em até 20 minutos</h2>
+            <p>
+                Sistema inteligente para contratações públicas conforme a Lei 14.133/2021.
+                Automatize documentos, garanta conformidade e economize tempo.
+            </p>
+            <a href="/drlicitacao/drlicitacaoETPTR" class="btn-primary">
+                <span>Iniciar nova contratação</span>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <h3>Conformidade garantida</h3>
+                <p>Alinhado ao checklist da SUBSECRETARIA DE LICITAÇÕES e ao TCE-RJ. Documentos à prova de auditoria.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Economia de tempo</h3>
+                <p>Preencha um formulário simples e obtenha ETP e TR completos prontos para uso.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Rastreabilidade</h3>
+                <p>Todas as decisões ficam registradas e justificadas automaticamente.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Exportação fácil</h3>
+                <p>Baixe em HTML ou DOCX, pronto para encaminhamento e publicação.</p>
+            </div>
+        </section>
+
+        <section class="requirements">
+            <h3>Requisitos para uso</h3>
+            <ul>
+                <li>Ser servidor público da Prefeitura de Barra Mansa</li>
+                <li>Ter clareza sobre o objeto da contratação (bem, serviço ou obra)</li>
+                <li>Reunir informações técnicas, orçamentos e justificativas</li>
+                <li>Dedicar alguns minutos para preencher cada passo com atenção</li>
+            </ul>
+        </section>
+
+        <div class="cta-bottom">
+            <a href="/drlicitacao/drlicitacaoETPTR" class="btn-primary">
+                <span>Começar agora</span>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Prefeitura Municipal de Barra Mansa — Desenvolvido por DiegoHacks</p>
+            <p style="margin-top: 4px; font-size: 0.8rem; color: #666;">Lei 14.133/2021 • Sistema de Gestão de Agentes Inteligentes</p>
+        </div>
+    </footer>
+</body>
+</html>

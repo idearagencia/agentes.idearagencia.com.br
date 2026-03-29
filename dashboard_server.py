@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Dashboard server for MikroTik and Squid alerts
-Serves static dashboards + API endpoints
+Dashboard server with authentication - final
+Serve estáticos de /var/www/agentes.idearagencia.com.br
+Injeção de header de usuário logado em páginas HTML APENAS
 """
 
 import os
@@ -9,454 +10,447 @@ import re
 import json
 import subprocess
 import pytz
+import threading
+import sys
+import io  # <-- adicionado
+from pathlib import Path
 from datetime import datetime, timezone
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import urllib.parse
+import mimetypes
 
-# FORCE TIMEZONE: America/Sao_Paulo (GMT-3)
+from auth import get_auth_manager, generate_session_cookie, parse_session_cookie, SESSION_COOKIE_NAME
+
 BRAZIL_TZ = pytz.timezone('America/Sao_Paulo')
 
+# Diretório base para arquivos estáticos (HTML, CSS, JS)
+WEB_ROOT = Path('/var/www/agentes.idearagencia.com.br')
+
+# Diretórios de dados (logs, eventos)
 LOG_DIR = '/root/.openclaw/workspace/logs'
 UNIFI_DATA_DIR = '/root/.openclaw/workspace/unifi_data'
 REPORTS_DIR = '/var/www/agentes.idearagencia.com.br/reports'
+INFRA_EVENTS_DIR = Path('/var/www/agentes.idearagencia.com.br/infra_events')
+INFRA_EVENTS_DIR.mkdir(parents=True, exist_ok=True)
+
+infra_events = []
+infra_events_lock = threading.Lock()
+auth_manager = get_auth_manager()
+
 
 class DashboardHandler(SimpleHTTPRequestHandler):
-    def set_no_cache_headers(self):
-        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Expires', '0')
+    """Handler com autenticação, servindo arquivos de WEB_ROOT e injetando header do usuário"""
+
+    def translate_path(self, path):
+        path = path.split('?', 1)[0]
+        path = path.split('#', 1)[0]
+        path = urllib.parse.unquote(path)
+        if path == '/' or path == '':
+            path = '/index.html'
+        elif not path.startswith('/api/') and not path.startswith('/infra-') and not path.startswith('/reports'):
+            if not path.startswith('/'):
+                path = '/' + path
+        full_path = WEB_ROOT / path.lstrip('/')
+        return str(full_path)
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
+
+        public = ['/login.html', '/api/login', '/api/logout', '/favicon.ico']
+        if parsed.path in public:
+            return self.handle_public(parsed)
+
+        session_token = self.get_session_token()
+        user = auth_manager.validate_session(session_token) if session_token else None
+
+        if not user:
+            # Redireciona para login com return-to
+            self.send_response(302)
+            self.send_header('Location', f'/login.html?redirect_to={urllib.parse.quote(parsed.path)}')
+            self.end_headers()
+            return
+
+        self.current_user = user
+
         if parsed.path == '/':
-            self.path = '/dashboard.html'
+            self.path = '/index.html'
             return super().do_GET()
-        elif parsed.path == '/alerts':
-            self.handle_alerts()
+        elif parsed.path in ['/alerts', '/alert', '/squid-dashboard.html', '/squid-alerts',
+                            '/squid-stats', '/proxy-metrics', '/infrastructure-events',
+                            '/unifi-dashboard.html', '/unifi-stats', '/mikrotik-stats',
+                            '/mikrotik-logs', '/reports']:
+            return self.dispatch_protected(parsed)
+        else:
+            self.path = parsed.path
+            return super().do_GET()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_data = self.rfile.read(content_length) if content_length > 0 else b'{}'
+
+        try:
+            data = json.loads(post_data.decode('utf-8'))
+        except:
+            data = {}
+
+        if parsed.path == '/api/login':
+            self.api_login(data)
+        elif parsed.path == '/api/logout':
+            self.api_logout()
+        elif parsed.path == '/infra-event':
+            self.handle_infra_event(data)
+        else:
+            self.send_error(404)
+
+    def handle_public(self, parsed):
+        if parsed.path == '/login.html':
+            self.path = '/login.html'
+            return super().do_GET()
+        elif parsed.path == '/api/login':
+            self.send_error(405)
+        elif parsed.path == '/api/logout':
+            self.api_logout()
+        else:
+            self.send_error(404)
+
+    def get_session_token(self):
+        cookie = self.headers.get('Cookie', '')
+        for c in cookie.split(';'):
+            c = c.strip()
+            if c.startswith(f'{SESSION_COOKIE_NAME}='):
+                return c.split('=', 1)[1]
+        return None
+
+    def api_login(self, credentials):
+        username = credentials.get('username', '').strip()
+        password = credentials.get('password', '')
+        if not username or not password:
+            self.send_error(400, json.dumps({'success': False, 'message': 'Credenciais obrigatórias'}))
             return
-        elif parsed.path == '/alert':
-            self.handle_alert(parsed.query)
-            return
-        elif parsed.path == '/squid-dashboard.html':
+
+        if auth_manager.verify_password(username, password):
+            token, expires = auth_manager.create_session(username, self.client_address[0])
+            cookie = generate_session_cookie(token)
+            user_info = auth_manager.get_user_info(username)
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Set-Cookie', cookie)
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                'success': True,
+                'user': user_info,
+                'expires_at': expires.isoformat()
+            }).encode())
+        else:
+            self.send_error(401, json.dumps({'success': False, 'message': 'Senha inválida'}))
+
+    def api_logout(self):
+        token = self.get_session_token()
+        if token:
+            auth_manager.invalidate_session(token)
+
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Set-Cookie', f'{SESSION_COOKIE_NAME}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
+        self.end_headers()
+        self.wfile.write(json.dumps({'success': True}).encode())
+
+    def dispatch_protected(self, parsed):
+        path = parsed.path
+        if path == '/alerts':
+            return self.handle_alerts()
+        if path == '/alert':
+            return self.handle_alert(parsed.query)
+        if path == '/squid-alerts':
+            return self.handle_squid_alerts()
+        if path == '/squid-stats':
+            return self.handle_squid_stats()
+        if path == '/squid-dashboard.html':
             self.path = '/squid-dashboard.html'
             return super().do_GET()
-        elif parsed.path == '/squid-alerts':
-            self.handle_squid_alerts()
-            return
-        elif parsed.path == '/squid-stats':
-            self.handle_squid_stats()
-            return
-        elif parsed.path == '/squid-realtime':
-            self.handle_squid_realtime()
-            return
-            self.handle_mikrotik_analytics()
-            return
-        elif parsed.path == '/proxy-metrics':
-            self.handle_proxy_metrics()
-            return
-        return super().do_GET()
+        if path == '/proxy-metrics':
+            return self.handle_proxy_metrics()
+        if path == '/infrastructure-events':
+            return self.handle_infrastructure_events()
+        if path == '/unifi-dashboard.html':
+            self.path = '/unifi-dashboard.html'
+            return super().do_GET()
+        if path == '/unifi-stats':
+            return self.handle_unifi_stats()
+        if path == '/mikrotik-stats':
+            return self.handle_mikrotik_stats()
+        if path == '/mikrotik-logs':
+            return self.handle_mikrotik_logs()
+        if path == '/reports':
+            return self.handle_reports_list()
+        self.send_error(404)
+
+    # ============ HANDLERS ============
 
     def handle_alerts(self):
+        files = [f for f in os.listdir(LOG_DIR) if f.startswith('mikrotik_alert_') and f.endswith('.md')]
+        files.sort(reverse=True)
+        self.send_json(files)
+
+    def handle_alert(self, query):
+        params = urllib.parse.parse_qs(query)
+        file = params.get('file', [None])[0]
+        if not file:
+            self.send_error(400, 'File required')
+            return
+        filepath = os.path.join(LOG_DIR, file)
+        if not os.path.exists(filepath):
+            self.send_error(404, 'Not found')
+            return
         try:
-            files = [f for f in os.listdir(LOG_DIR) if f.startswith('mikrotik_alert_') and f.endswith('.md')]
-            files.sort(reverse=True)
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
             self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Type', 'text/plain; charset=utf-8')
             self.end_headers()
-            self.wfile.write(json.dumps(files).encode())
+            self.wfile.write(content.encode())
         except Exception as e:
             self.send_error(500, str(e))
 
-
     def handle_squid_alerts(self):
-        ALERT_DIR = LOG_DIR
         try:
-            files = [f for f in os.listdir(ALERT_DIR) if f.startswith('squid_alert_') and f.endswith('.md')]
+            files = [f for f in os.listdir(LOG_DIR) if f.startswith('squid_alert_') and f.endswith('.md')]
             files.sort(reverse=True)
             alerts = []
             for f in files[:30]:
-                path = os.path.join(ALERT_DIR, f)
+                path = os.path.join(LOG_DIR, f)
                 try:
                     with open(path, 'r', encoding='utf-8') as fh:
                         content = fh.read()
                     m = re.search(r'\*\*Alertas detectados:\*\*(.*?)(\*\*Recomendações:|\*)', content, re.S)
                     if m:
-                        alert_block = m.group(1).strip()
-                        alert_lines = [line.strip().lstrip('-* ') for line in alert_block.split('\n') if line.strip().startswith('-') or line.strip().startswith('*')]
+                        block = m.group(1).strip()
+                        alert_lines = [line.strip().lstrip('-* ') for line in block.split('\n') if line.strip().startswith(('-', '*'))]
                         alerts.extend(alert_lines[:10])
                 except:
                     pass
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(alerts[:50]).encode())
+            self.send_json(alerts[:50])
         except Exception as e:
             self.send_error(500, str(e))
-
 
     def handle_squid_stats(self):
-        ALERT_DIR = LOG_DIR
-        # PRIORITIZAR dados reais se disponível (WebHacks)
-        REALTIME_FILE = '/var/www/agentes.idearagencia.com.br/squid-realtime.json'
-        if os.path.exists(REALTIME_FILE):
-            try:
-                with open(REALTIME_FILE, 'r', encoding='utf-8') as f:
+        """Retorna estatísticas do Squid a partir do JSON gerado pelo generate_squid_stats.py"""
+        try:
+            json_path = '/var/www/agentes.idearagencia.com.br/logs/squid/squid-stats.json'
+            if os.path.exists(json_path):
+                with open(json_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                self.send_response(200)
-                self.set_no_cache_headers()
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(data).encode())
-                return
-            except Exception:
-                pass  # se erro, Cair para fallback (alertas)
-        try:
-            files = [f for f in os.listdir(ALERT_DIR) if f.startswith('squid_alert_') and f.endswith('.md')]
-            files.sort(reverse=True)
-            stats = {
-                'total_requests': 0,
-                'status_4xx': 0,
-                'status_5xx': 0,
-                'unique_users': 0,
-                'top_domains': {},
-                'top_users_bytes': [],
-                'auth_407_by_ip': {}
-            }
-            if files:
-                latest = os.path.join(ALERT_DIR, files[0])
-                # Usar mtime do arquivo (UTC) para timestamp preciso
-                file_mtime = os.path.getmtime(latest)
-                # Criar datetime aware em UTC
-                file_dt_utc = datetime.fromtimestamp(file_mtime, tz=timezone.utc)
-                # Formatar como ISO com 'Z' (UTC)
-                stats['last_analyzed'] = file_dt_utc.strftime('%Y-%m-%dT%H:%M:%SZ')
-                
-                with open(latest, 'r', encoding='utf-8') as f:
-                    content = f.read()
+                self.send_json(data)
+            else:
+                # Fallback: tentar ler arquivos .md antigos (compatibilidade)
+                files = [f for f in os.listdir(LOG_DIR) if f.startswith('squid_alert_') and f.endswith('.md')]
+                files.sort(reverse=True)
+                stats = {'total_requests':0, 'status_4xx':0, 'status_5xx':0, 'unique_users':0,
+                        'top_domains':{}, 'top_users_bytes':[], 'auth_407_by_ip':{}}
 
-                def get_number(pattern):
-                    m = re.search(pattern, content)
+                if files:
+                    files_with_mtime = [(f, os.path.getmtime(os.path.join(LOG_DIR, f))) for f in files]
+                    files_with_mtime.sort(key=lambda x: x[1], reverse=True)
+                    latest = os.path.join(LOG_DIR, files_with_mtime[0][0])
+                    stats['last_analyzed'] = datetime.fromtimestamp(files_with_mtime[0][1], tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+                    with open(latest, 'r', encoding='utf-8') as f:
+                        content = f.read()
+
+                    def get_num(pat):
+                        m = re.search(pat, content)
+                        if m:
+                            try: return int(m.group(1).replace(',','').replace('.',''))
+                            except: return 0
+                        return 0
+
+                    stats['total_requests'] = get_num(r'Requisições\s*\(24h\):\s*([\d,.]+)')
+                    stats['status_4xx'] = get_num(r'Erros 4xx\s*\(24h\):\s*([\d,.]+)')
+                    stats['status_5xx'] = get_num(r'Erros 5xx\s*\(24h\):\s*([\d,.]+)')
+                    stats['unique_users'] = get_num(r'Usuários únicos\s*\(24h\):\s*([\d,.]+)')
+                    stats['unique_domains'] = get_num(r'Domínios únicos\s*\(24h\):\s*([\d,.]+)')
+
+                    m = re.search(r'Top domínios(?:\s*\(24h\))?:\s*(\{.*?\})', content)
                     if m:
-                        num = m.group(1).replace(',', '').replace('.', '')
-                        try:
-                            return int(num)
-                        except:
-                            return 0
-                    return 0
+                        try: stats['top_domains'] = json.loads(m.group(1))
+                        except: pass
 
-                # Formato novo: "Requisições (1h): 0" ou "Requisições (última análise): X"
-                stats['total_requests'] = get_number(r'Requisições\s*\(24h\):\s*([\d,.]+)')
-                stats['status_4xx'] = get_number(r'Erros 4xx\s*\(24h\):\s*([\d,.]+)')
-                stats['status_5xx'] = get_number(r'Erros 5xx\s*\(24h\):\s*([\d,.]+)')
-                stats['unique_users'] = get_number(r'Usuários únicos\s*\(24h\):\s*([\d,.]+)')
-                stats['unique_domains'] = get_number(r'Domínios únicos\s*\(24h\):\s*([\d,.]+)')
+                    m = re.search(r'Top usuários por tráfego:\s*(.+)', content)
+                    if m:
+                        entries = re.findall(r'([^,(]+?)\s*\(([\d.]+)\s*MB?\)', m.group(1))
+                        stats['top_users_bytes'] = [(u.strip(), float(b)*1e6) for u,b in entries]
 
-                # Top domínios (24h) - pode aparecer com ou sem (24h)
-                m = re.search(r'Top domínios(?:\s*\(24h\))?:\s*(\{.*?\})', content)
-                if m:
-                    try:
-                        stats['top_domains'] = json.loads(m.group(1))
-                    except:
-                        pass
+                    stats['auth_407_by_ip'] = {}
+                    for ip, cnt in re.findall(r'Alto volume de 407: IP ([\d.]+) com ([\d,.]+) falhas', content):
+                        stats['auth_407_by_ip'][ip] = int(cnt.replace(',','').replace('.',''))
 
-                # Top usuários por tráfego (24h)
-                m = re.search(r'Top usuários por tráfego:\s*(.+)', content)
-                if m:
-                    users_str = m.group(1)
-                    entries = re.findall(r'([^,(]+?)\s*\(([\d.]+)\s*MB?\)', users_str)
-                    stats['top_users_bytes'] = [(u.strip(), float(b)*1e6) for u,b in entries]
+                    stats['suspicious'] = []
+                    for domain, reason in re.findall(r'Domínio suspeito:\s*([^\n]+?)\s*\(([^)]+)\)', content):
+                        stats['suspicious'].append({'domain': domain.strip(), 'reason': reason.strip()})
 
-                stats['auth_407_by_ip'] = {}
-                for line in re.findall(r'Alto volume de 407: IP ([\d.]+) com ([\d,.]+) falhas', content):
-                    ip, count = line
-                    stats['auth_407_by_ip'][ip] = int(count.replace(',','').replace('.',''))
-
-                # Domínios suspeitos
-                stats['suspicious'] = []
-                for line in re.findall(r'Domínio suspeito:\s*([^\n]+?)\s*\(([^)]+)\)', content):
-                    domain, reason = line
-                    stats['suspicious'].append({'domain': domain.strip(), 'reason': reason.strip()})
-
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(stats).encode())
+                self.send_json(stats)
         except Exception as e:
             self.send_error(500, str(e))
-
-
-    def handle_squid_realtime(self):
-        """Retorna dados reais coletados do log do Squid (WebHacks)"""
-        REALTIME_FILE = '/var/www/agentes.idearagencia.com.br/squid-realtime.json'
-        try:
-            if not os.path.exists(REALTIME_FILE):
-                # Retornar dados vazios ou gerar alerta
-                self.send_response(404)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({'error': 'Dados não disponíveis. Execute o coletor.'}).encode())
-                return
-            
-            with open(REALTIME_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(data).encode())
-        except Exception as e:
-            self.send_error(500, str(e))
-
 
     def handle_proxy_metrics(self):
-        """Retorna métricas do servidor proxy 172.16.1.9 coletadas via SSH"""
-        PROXY_FILE = '/var/www/agentes.idearagencia.com.br/proxy-realtime.json'
+        PROXY_IP = '172.16.1.9'
+        PROXY_USER = 'openclaw'
+        SSH_KEY = '/var/lib/openclaw/.ssh/id_ed25519'
+        metrics = {}
         try:
-            if not os.path.exists(PROXY_FILE):
-                self.send_response(404)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({'error': 'Métricas do proxy não disponíveis. Execute o coletor.'}).encode())
-                return
-            
-            with open(PROXY_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # Garantir campos mínimos
-            data.setdefault('host', '172.16.1.9')
-            data.setdefault('status', 'online')
-            
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(data).encode())
+            ssh_cmd = f"ssh -i {SSH_KEY} -o ConnectTimeout=5 -o StrictHostKeyChecking=no {PROXY_USER}@{PROXY_IP} 'python3 /tmp/get_proxy_metrics.py'"
+            result = subprocess.run(ssh_cmd, shell=True, capture_output=True, text=True, timeout=20)
+            if result.returncode == 0:
+                try:
+                    metrics = json.loads(result.stdout.strip())
+                    metrics['status'] = 'online'
+                    metrics['timestamp'] = datetime.now(BRAZIL_TZ).isoformat()
+                    self.send_json(metrics)
+                    return
+                except Exception as e:
+                    metrics = {'error': f'JSON parse error: {e}', 'status': 'degraded'}
+            else:
+                metrics = {'error': f'SSH falhou: {result.stderr.strip()}', 'status': 'degraded'}
         except Exception as e:
-            self.send_error(500, str(e))
+            metrics = {'error': str(e), 'status': 'degraded'}
 
-
-    def handle_mikrotik_analytics(self):
-        """Retorna dados do analytics do MikroTik (coletado via script)"""
-        ANALYTICS_FILE = '/var/www/agentes.idearagencia.com.br/mikrotik-analytics.json'
+        # Se SSH falhou, testar ping para ver se host está reachable
         try:
-            if not os.path.exists(ANALYTICS_FILE):
-                self.send_response(404)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({'error': 'Dados do MikroTik não disponíveis. Execute o coletor.'}).encode())
-                return
-            
-            with open(ANALYTICS_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # Garantir campos mínimos
-            data.setdefault('status', 'online')
-            
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(data).encode())
+            ping_cmd = f"ping -c 2 -W 2 {PROXY_IP}"
+            ping_result = subprocess.run(ping_cmd, shell=True, capture_output=True, text=True, timeout=10)
+            if ping_result.returncode == 0:
+                metrics['status'] = 'online'  # Host vivo, assumimos serviços online
+                metrics['ping_ok'] = True
+            else:
+                metrics['status'] = 'offline'
+                metrics['ping_ok'] = False
         except Exception as e:
-            self.send_error(500, str(e))
+            metrics['status'] = 'offline'
+            metrics['ping_error'] = str(e)
 
+        metrics['timestamp'] = datetime.now(BRAZIL_TZ).isoformat()
+        self.send_json(metrics)
+
+    def handle_infrastructure_events(self):
+        with infra_events_lock:
+            recent = list(reversed(infra_events[-100:]))
+        self.send_json(recent)
+
+    def handle_infra_event(self, event):
+        required = ['source', 'type', 'timestamp', 'data']
+        if not all(k in event for k in required):
+            self.send_error(400, json.dumps({'success': False, 'message': 'Evento inválido'}))
+            return
+
+        event_file = INFRA_EVENTS_DIR / f"{event['source']}_{datetime.now(BRAZIL_TZ).strftime('%Y%m%d_%H%M%S')}_{event['type']}.json"
+        try:
+            with open(event_file, 'w') as f:
+                json.dump(event, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"[!] Erro salvando evento: {e}")
+
+        with infra_events_lock:
+            infra_events.append(event)
+            if len(infra_events) > 1000:
+                infra_events.pop(0)
+
+        self.send_json({'status': 'ok', 'received': True})
 
     def handle_unifi_stats(self):
         try:
-            # Ler último snapshot do UniFi
             files = [f for f in os.listdir(UNIFI_DATA_DIR) if f.startswith('unifi_snapshot_') and f.endswith('.json')]
             files.sort(reverse=True)
             if not files:
-                self.send_error(404, 'No UniFi data available')
+                self.send_error(404, 'No data')
                 return
-            latest = os.path.join(UNIFI_DATA_DIR, files[0])
-            with open(latest, 'r') as f:
+            with open(os.path.join(UNIFI_DATA_DIR, files[0]), 'r') as f:
                 data = json.load(f)
 
-            # Stats simples baseados no que temos
             devices = data.get('devices', [])
             aps = [d for d in devices if d.get('type') in ['uap', 'uap']]
-            switches = [d for d in devices if d.get('type') == 'usw']
-            clients = data.get('clients', [])
-            rogues = data.get('rogue_aps', [])
-            alerts = data.get('alerts', [])
-
             stats = {
                 'timestamp': data.get('timestamp'),
                 'total_aps': len(aps),
-                'aps_online': len(aps),  # simplificado: todos online pois foram coletados
+                'aps_online': len(aps),
                 'aps_offline': 0,
-                'total_switches': len(switches),
+                'total_switches': len([d for d in devices if d.get('type') == 'usw']),
                 'total_ssids': len([s for s in data.get('ssids', []) if s.get('enabled', True)]),
-                'active_clients_24h': len(clients),  # simplificado
-                'rogue_aps_total': len(rogues),
+                'active_clients_24h': len(data.get('clients', [])),
+                'rogue_aps_total': len(data.get('rogue_aps', [])),
                 'rogue_aps_2g': 0,
                 'rogue_aps_5g': 0,
-                'alerts_active': len(alerts),
-                'alerts_list': alerts[:5]
+                'alerts_active': len(data.get('alerts', [])),
+                'alerts_list': data.get('alerts', [])[:5]
             }
-
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(stats).encode())
+            self.send_json(stats)
         except Exception as e:
             self.send_error(500, str(e))
 
-
-    def do_GET(self):
-        parsed = urllib.parse.urlparse(self.path)
-        if parsed.path == '/':
-            self.path = '/dashboard.html'
-            return super().do_GET()
-        elif parsed.path == '/alerts':
-            self.handle_alerts()
-            return
-        elif parsed.path == '/alert':
-            self.handle_alert(parsed.query)
-            return
-        elif parsed.path == '/squid-dashboard.html':
-            self.path = '/squid-dashboard.html'
-            return super().do_GET()
-        elif parsed.path == '/squid-alerts':
-            self.handle_squid_alerts()
-            return
-        elif parsed.path == '/squid-stats':
-            self.handle_squid_stats()
-            return
-        elif parsed.path == '/proxy-metrics':
-            self.handle_proxy_metrics()
-            return
-        elif parsed.path == '/unifi-dashboard.html':
-            self.path = '/unifi-dashboard.html'
-            return super().do_GET()
-        elif parsed.path == '/unifi-stats':
-            self.handle_unifi_stats()
-            return
-        elif parsed.path == '/api/mikrotik-analytics':
-            self.handle_mikrotik_analytics()
-            return
-        elif parsed.path == '/mikrotik-stats':
-            self.handle_mikrotik_stats()
-            return
-        elif parsed.path == '/api/mikrotik-analytics':
-            self.handle_mikrotik_analytics()
-            return
-        elif parsed.path == '/mikrotik-logs':
-            self.handle_mikrotik_logs()
-            return
-        elif parsed.path == '/reports-list':
-            self.handle_reports_list()
-            return
-        return super().do_GET()
-
     def handle_mikrotik_stats(self):
-        """Retorna estatísticas do MikroTik a partir do alerta com mais logs"""
         try:
             import glob
-            # Procurar arquivos de alerta
             pattern = os.path.join(LOG_DIR, 'mikrotik_alert_*.md')
             files = glob.glob(pattern)
             if not files:
                 self.send_error(404, 'Nenhum alerta MikroTik disponível')
                 return
-            
-            # Avaliar todos os arquivos e pegar o com maior total de logs
+
             best_file = None
             best_total = 0
             best_content = ''
             best_mtime = 0
-            
+
             for filepath in files:
                 try:
                     with open(filepath, 'r', encoding='utf-8') as f:
                         content = f.read()
-                    
                     total_match = re.search(r'Total de logs analisados:\s*([\d,.]+)', content)
-                    total_logs = 0
-                    if total_match:
-                        try:
-                            total_logs = int(total_match.group(1).replace(',', '').replace('.', ''))
-                        except:
-                            total_logs = 0
-                    
+                    total_logs = int(total_match.group(1).replace(',', '').replace('.', '')) if total_match else 0
                     file_mtime = os.path.getmtime(filepath)
-                    
-                    # Escolher arquivo com mais logs; se empatar, o mais recente
                     if total_logs > best_total or (total_logs == best_total and file_mtime > best_mtime):
                         best_file = filepath
                         best_total = total_logs
                         best_content = content
                         best_mtime = file_mtime
-                except Exception as e:
-                    print(f"[!] Erro lendo {filepath}: {e}")
+                except:
                     continue
-            
-            if best_file is None or best_total == 0:
-                # Fallback: usar o arquivo mais recente, mesmo sem dados
+
+            if best_file is None:
                 files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
                 best_file = files[0]
-                best_mtime = os.path.getmtime(best_file)
-                with open(best_file, 'r', encoding='utf-8') as f:
+                with open(best_file, 'r') as f:
                     best_content = f.read()
-                best_total = 0
-            
+                best_mtime = os.path.getmtime(best_file)
+
             last_analyzed = datetime.fromtimestamp(best_mtime, tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-            content = best_content
-            
-            # Extrair tópicos (JSON) — pode estar em linha única após "Por tópico:"
+
             topics = {}
-            pos = content.find('Por tópico:')
+            pos = best_content.find('Por tópico:')
             if pos != -1:
-                # Procurar chave { após esta posição
-                start = content.find('{', pos)
+                start = best_content.find('{', pos)
                 if start != -1:
-                    # Encontrar o } correspondente
                     depth = 0
-                    end = None
-                    for i in range(start, len(content)):
-                        if content[i] == '{':
-                            depth += 1
-                        elif content[i] == '}':
+                    for i in range(start, len(best_content)):
+                        if best_content[i] == '{': depth += 1
+                        elif best_content[i] == '}':
                             depth -= 1
                             if depth == 0:
-                                end = i + 1
+                                try:
+                                    topics = json.loads(best_content[start:i+1])
+                                except:
+                                    pass
                                 break
-                    if end:
-                        topics_str = content[start:end]
-                        try:
-                            topics = json.loads(topics_str)
-                        except json.JSONDecodeError as e:
-                            print(f"[!] JSON decode error em {best_file}: {e}")
-                            topics = {}
-            
-            # Extrair alertas detectados
+
             alerts = []
-            alerts_section = re.search(r'Alertas detectados:(.*?)(?=\n\*{2,}|\Z)', content, re.DOTALL)
+            alerts_section = re.search(r'Alertas detectados:(.*?)(?=\n\*{2,}|\Z)', best_content, re.DOTALL)
             if alerts_section:
                 for line in alerts_section.group(1).strip().split('\n'):
                     line = line.strip()
                     if line.startswith('- '):
                         alerts.append(line[2:].strip())
-            
+
             stats = {
                 'timestamp': last_analyzed,
                 'total_logs_24h': best_total,
@@ -465,22 +459,22 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 'top_alerts': alerts[:20],
                 'sources_count': len(topics)
             }
-            
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(stats).encode())
-            
+            self.send_json(stats)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             self.send_error(500, f'Erro MikroTik: {str(e)}')
 
+    def handle_mikrotik_logs(self):
+        try:
+            files = [f for f in os.listdir(LOG_DIR) if f.startswith('mikrotik_alert_') and f.endswith('.md')]
+            files.sort(reverse=True)
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(files).encode())
+        except Exception as e:
+            self.send_error(500, str(e))
+
     def handle_reports_list(self):
-        """Lista todos os relatórios PDF disponíveis com metadados"""
         try:
             reports = []
             if os.path.exists(REPORTS_DIR):
@@ -489,15 +483,13 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                         filepath = os.path.join(REPORTS_DIR, filename)
                         try:
                             stat = os.stat(filepath)
-                            # Extrair nome do agente do filename: Agent-Titulo.pdf
-                            name_parts = filename[:-4].split('-', 1)  # remove .pdf e split no primeiro '-'
+                            name_parts = filename[:-4].split('-', 1)
                             if len(name_parts) >= 2:
                                 agent = name_parts[0]
                                 title = name_parts[1].replace('-', ' ').title()
                             else:
                                 agent = 'Desconhecido'
                                 title = filename[:-4]
-                            
                             reports.append({
                                 'filename': filename,
                                 'agent': agent,
@@ -507,79 +499,104 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                             })
                         except OSError:
                             continue
-            
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(reports).encode())
+            self.send_json(reports)
         except Exception as e:
             self.send_error(500, str(e))
 
+    def send_json(self, data):
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(data, ensure_ascii=False).encode())
 
-    def do_POST(self):
-        parsed = urllib.parse.urlparse(self.path)
-        if parsed.path == '/proxy-metrics-upload':
-            self.handle_proxy_metrics_upload()
-        else:
-            self.send_error(404, 'Not Found')
+    # ============ INJEÇÃO DE HEADER LOGADO ============
 
-    def handle_proxy_metrics_upload(self):
-        """Recebe métricas do proxy via POST e salva em arquivo"""
+    def send_head(self):
+        """Sobrescreve para injetar header de usuário em páginas HTML APENAS"""
+        path = self.translate_path(self.path)
+
+        # Se for diretório, procurar por index.html
+        if os.path.isdir(path):
+            for index in ["index.html", "index.htm"]:
+                index_path = os.path.join(path, index)
+                if os.path.exists(index_path) and os.path.isfile(index_path):
+                    path = index_path
+                    break
+            else:
+                return super().send_head()
+
+        if not os.path.exists(path) or not os.path.isfile(path):
+            return super().send_head()
+
+        # Se não houver current_user, servir normalmente
+        if not hasattr(self, 'current_user'):
+            return super().send_head()
+
+        # Se não for HTML, servir normalmente (CSS, JS, imagens, etc.)
+        if not path.endswith('.html'):
+            return super().send_head()
+
+        # Ler o arquivo HTML
         try:
-            content_length = int(self.headers.get('Content-Length', 0))
-            post_data = self.rfile.read(content_length)
-            data = json.loads(post_data.decode('utf-8'))
-            
-            # Garantir campos mínimos
-            data.setdefault('host', '172.16.1.9')
-            data.setdefault('status', 'online')
-            
-            output_path = '/var/www/agentes.idearagencia.com.br/proxy-realtime.json'
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps({'status': 'ok', 'message': 'Metrics received'}).encode())
-        except Exception as e:
-            self.send_error(500, str(e))
-        """Retorna dados do analytics do MikroTik (coletado via script)"""
-        ANALYTICS_FILE = '/var/www/agentes.idearagencia.com.br/mikrotik-analytics.json'
+            with open(path, 'rb') as f:
+                content = f.read()
+        except OSError:
+            self.send_error(404, "File not found")
+            return None
+
+        # Determinar encoding
         try:
-            if not os.path.exists(ANALYTICS_FILE):
-                self.send_response(404)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({'error': 'Dados do MikroTik não disponíveis. Execute o coletor.'}).encode())
-                return
-            
-            with open(ANALYTICS_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # Garantir campos mínimos
-            data.setdefault('status', 'online')
-            
-            self.send_response(200)
-            self.set_no_cache_headers()
-            self.set_no_cache_headers()
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(data).encode())
-        except Exception as e:
-            self.send_error(500, str(e))
+            html = content.decode('utf-8')
+        except UnicodeDecodeError:
+            html = content.decode('latin-1')
+
+        # Injetar header de usuário
+        user = self.current_user
+        user_header = f'''<div id="user-header" style="padding: 6px 16px; font-family: Inter, sans-serif; height: 40px; margin-bottom: 8px; max-width: 1600px; margin: 0 auto; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+  <div style="color: #A5A5A5; font-weight: 500; font-size: 14px;">
+    👋 Olá, <span style="color: #f4f4f4;">{user['full_name']}</span> <small style="color: #666;">({user['role']})</small>
+  </div>
+  <button onclick="fetch('/api/logout', {{method: 'POST'}}).then(() => window.location.href='/login.html')" 
+          style="background: #EC1D3A; color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; height: 28px;">
+    Sair
+  </button>
+</div>
+'''
+
+        body_pos = html.find('<body')
+        # Encontrar <body e injetar logo após a abertura
+        if body_pos != -1:
+            tag_end = html.find('>', body_pos)
+            if tag_end != -1:
+                insert_pos = tag_end + 1
+                html = html[:insert_pos] + user_header + html[insert_pos:]
+
+        # Injetar footer antes do </body>
+        footer = '''<footer style="max-width: 1600px; margin: 0 auto; padding: 24px 16px; text-align: center; color: #666; font-size: 13px; border-top: 1px solid #333; margin-top: 40px;">
+  Sistema de Gestão de Agentes Inteligentes — <strong style="color: #00d4ff;">AgentOS</strong><br>
+  Desenvolvido por <span style="color: #A5A5A5;">DiegoHacks</span> @ 2026
+</footer>
+'''
+        body_close = html.rfind('</body>')
+        if body_close != -1:
+            html = html[:body_close] + footer + html[body_close:]
+
+        # Retornar conteúdo modificado
+        enc = sys.getfilesystemencoding()
+        content = html.encode('utf-8')
+        self.send_response(200)
+        self.send_header("Content-type", "text/html; charset=%s" % enc)
+        self.send_header("Content-Length", str(len(content)))
+        self.end_headers()
+        return io.BytesIO(content)
+
 
 def run_server(host='0.0.0.0', port=8080):
     server = HTTPServer((host, port), DashboardHandler)
     print(f"[+] Dashboard server running at http://{host}:{port}")
+    print(f"[+] Login: http://{host}:{port}/login.html")
     server.serve_forever()
+
 
 if __name__ == '__main__':
     run_server()
