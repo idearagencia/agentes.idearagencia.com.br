@@ -859,18 +859,27 @@
       }
       
       // Domínios Suspeitos
-      if (data.suspicious && Array.isArray(data.suspicious)) {
-        const tbody = document.getElementById('suspiciousTable');
-        tbody.innerHTML = '';
+      const suspiciousTable = document.getElementById('suspiciousTable');
+      if (data.suspicious && Array.isArray(data.suspicious) && data.suspicious.length > 0) {
+        suspiciousTable.innerHTML = '';
         data.suspicious.slice(0, 10).forEach(item => {
           const tr = document.createElement('tr');
           const badgeClass = item.reason.includes('IP') ? 'badge-danger' : 'badge-warning';
           tr.innerHTML = `<td>${item.domain}</td><td><span class="${badgeClass}">${item.reason}</span></td>`;
-          tbody.appendChild(tr);
+          suspiciousTable.appendChild(tr);
         });
       } else {
-        const tbody = document.getElementById('suspiciousTable');
-        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-sec);">Nenhum domínio suspeito detectado</td></tr>';
+        // Mensagem de sistema seguro
+        suspiciousTable.innerHTML = `
+          <tr>
+            <td colspan="2" style="text-align:center;padding:40px 16px;color:var(--success);">
+              <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
+                <span style="display:inline-block;width:12px;height:12px;background:var(--success);border-radius:50%;box-shadow:0 0 8px var(--success);"></span>
+                <span style="font-weight:600;color:var(--success);">Seu sistema está seguro, livre de domínios suspeitos. Parabéns!</span>
+              </div>
+            </td>
+          </tr>
+        `;
       }
       
       // Erros 5xx (se disponível)
