@@ -1,17 +1,17 @@
 {
-  "timestamp": "2026-03-29T20:04:02.235472",
+  "timestamp": "2026-03-29T20:13:01.322767",
   "host": "proxy-01",
   "cpu": {
-    "usage_percent": 3.2,
+    "usage_percent": 0.6,
     "cores": 12,
-    "load_1min": 0.38,
-    "load_5min": 0.34,
-    "load_15min": 0.2
+    "load_1min": 0.07,
+    "load_5min": 0.12,
+    "load_15min": 0.14
   },
   "memory": {
     "total_gb": 15.42,
     "used_gb": 0.77,
-    "free_gb": 6.75,
+    "free_gb": 6.73,
     "percent": 5.0
   },
   "disk": {
@@ -73,9 +73,9 @@
   "squid": {
     "service_running": true,
     "port_open": true,
-    "active_connections": 121,
+    "active_connections": 137,
     "process_count": 19
   },
-  "collected_at": "2026-03-29T20:04:02.253701",
+  "collected_at": "2026-03-29T20:13:01.340675",
   "status": "online"
 }

@@ -360,15 +360,14 @@
       </div>
     </div>
 
-    <a href="/index.html" class="back-link">← Voltar ao Dashboard</a>
+    <a href="/index.html" class="back-link">Voltar para Agentes Inteligentes</a>
 
     <div class="update-time" id="updateTime">
-      <span class="server-label">📊 Servidor Proxy: 172.16.1.9</span>
+      <span class="server-label">Servidor Proxy: 172.16.1.9</span>
       <span id="server-status" class="server-status" style="margin-left:12px;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.3);color:var(--danger);">
         <span style="display:inline-block;width:8px;height:8px;background:var(--danger);border-radius:50%;margin-right:6px;"></span>OFFLINE
       </span>
       <span class="update-label" style="margin-left:12px;">• Atualizado: --</span>
-      <span id="last-analysis" class="last-analysis" style="margin-left:12px;font-size:11px;color:var(--text-sec);">• Última análise: --</span>
     </div>
 
     <!-- Métricas do Servidor Proxy (Grid 9 colunas) -->
@@ -740,34 +739,39 @@
       const lastAnalysisElem = document.getElementById('last-analysis');
       const periodElem = document.getElementById('data-period');
       const syncElem = document.getElementById('sync-status');
-      const timestamp = data.last_analyzed || data.last_updated;
       
-      if (timestamp) {
-        try {
-          const dt = new Date(timestamp);
-          const formatted = dt.toLocaleTimeString('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-          lastAnalysisElem.textContent = '• Última análise: ' + formatted;
-          
-          // Calcular período (4h anteriores)
-          const periodStart = new Date(dt);
-          periodStart.setHours(periodStart.getHours() - 4);
-          const periodFormatted = periodStart.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) + ' - ' + formatted;
-          periodElem.textContent = '• Período: ' + periodFormatted;
-          
-          // Sincronizado (quando o arquivo foi gerado)
-          const syncTime = new Date(data.generated_at || timestamp);
-          const syncFormatted = syncTime.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-          syncElem.textContent = '• Sincronizado: ' + syncFormatted;
-          
-        } catch (e) {
-          lastAnalysisElem.textContent = '• Última análise: ' + timestamp;
-          periodElem.textContent = '• Período: --';
-          syncElem.textContent = '• Sincronizado: --';
-        }
-      } else {
+      // Priorizar: last_analyzed (timestamp do último log), generated_at (timestamp do arquivo), ou timestamp atual como fallback
+      let analysisTime = data.last_analyzed || data.generated_at;
+      let syncTime = data.generated_at || data.last_analyzed;
+      
+      // Se não houver nenhum, usar timestamp atual
+      if (!analysisTime) {
+        analysisTime = new Date().toISOString();
+        syncTime = analysisTime;
+      }
+      
+      try {
+        const dt = new Date(analysisTime);
+        const formatted = dt.toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        // Atualizar "Última análise" (no topo, ao lado de "Atualizado")
+        lastAnalysisElem.textContent = '• Última análise: ' + formatted;
+        
+        // Calcular período (4h anteriores)
+        const periodStart = new Date(dt);
+        periodStart.setHours(periodStart.getHours() - 4);
+        const periodFormatted = periodStart.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) + ' - ' + formatted;
+        periodElem.textContent = '• Período: ' + periodFormatted;
+        
+        // Sincronizado (quando o arquivo foi gerado)
+        const syncDt = new Date(syncTime);
+        const syncFormatted = syncDt.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+        syncElem.textContent = '• Sincronizado: ' + syncFormatted;
+        
+      } catch (e) {
+        console.error('Erro ao formatar datas:', e);
         lastAnalysisElem.textContent = '• Última análise: --';
         periodElem.textContent = '• Período: --';
         syncElem.textContent = '• Sincronizado: --';

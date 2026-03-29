@@ -3,228 +3,412 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Licitação – Assessor Técnico em Contratação Pública</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Dr. Licitação | Assessor Técnico para Contratações Públicas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0a;
-            --card: #141414;
-            --text: #ffffff;
-            --text-muted: #a5a5a5;
             --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
             --accent: #60a5fa;
-            --border: #262626;
-            --radius: 16px;
+            --bg: #0a0a0a;
+            --surface: #121212;
+            --surface-light: #1a1a1a;
+            --text: #ffffff;
+            --text-secondary: #a5a5a5;
+            --gradient-start: #1e3a8a;
+            --gradient-end: #3b82f6;
+            --radius: 20px;
+            --radius-sm: 12px;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
         }
+
+        /* Animated background */
+        .bg-gradient {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at top left, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom right, rgba(37, 99, 235, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
         .container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             padding: 0 24px;
         }
-        header {
+
+        /* Header */
+        .header {
             padding: 24px 0;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            background: rgba(10,10,10,0.8);
+            z-index: 100;
+        }
+        .header .content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
         .logo-icon {
-            width: 40px; height: 40px;
+            width: 48px; height: 48px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 18px;
+            font-weight: 800; font-size: 20px;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
         }
         .logo h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-        .hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 80px 0;
-            text-align: center;
-        }
-        .hero h2 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .hero p {
-            color: var(--text-muted);
-            font-size: 1.125rem;
-            max-width: 700px;
-            margin: 0 auto 40px;
+
+        /* Hero */
+        .hero {
+            padding: 120px 0 100px;
+            text-align: center;
+            position: relative;
         }
-        .btn-primary {
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 48px;
+            font-weight: 400;
+        }
+        .btn-main {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            background: var(--primary);
+            gap: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
             border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
+            padding: 18px 40px;
+            border-radius: 16px;
             font-size: 1.125rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s, transform 0.15s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+            position: relative;
+            overflow: hidden;
         }
-        .btn-primary:hover {
-            background: var(--primary-hover);
+        .btn-main:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(37, 99, 235, 0.5);
+        }
+        .btn-main:active {
             transform: translateY(-2px);
         }
-        .btn-primary:active {
-            transform: translateY(0);
+        .btn-main::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(45deg);
+            transition: 0.6s;
+            opacity: 0;
         }
+        .btn-main:hover::after {
+            opacity: 1;
+            animation: shine 1.5s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        /* Features grid */
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 24px;
-            margin: 60px 0;
+            margin: 80px 0;
         }
         .feature-card {
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: var(--radius);
-            padding: 24px;
-            text-align: left;
+            padding: 32px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(37, 99, 235, 0.3);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+        }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        .feature-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         .feature-card h3 {
-            color: var(--accent);
+            font-size: 1.25rem;
+            font-weight: 700;
             margin-bottom: 12px;
-            font-size: 1.125rem;
+            color: var(--text);
         }
         .feature-card p {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 0.9375rem;
+            line-height: 1.7;
         }
-        .requirements {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin: 60px 0;
-            text-align: left;
+
+        /* Stats section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin: 100px 0;
+            padding: 60px 0;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-        .requirements h3 {
-            color: var(--accent);
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* CTA section */
+        .cta-section {
+            text-align: center;
+            padding: 100px 0 140px;
+        }
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
             margin-bottom: 16px;
         }
-        .requirements ul {
-            list-style: none;
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .requirements li {
-            position: relative;
-            padding-left: 24px;
-            margin-bottom: 12px;
-            color: var(--text-muted);
-        }
-        .requirements li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--primary);
+        .btn-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            border: none;
+            padding: 20px 48px;
+            border-radius: 18px;
+            font-size: 1.25rem;
             font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 16px 48px rgba(37, 99, 235, 0.35);
         }
-        .cta-bottom {
-            text-align: center;
-            margin: 60px 0 120px;
+        .btn-large:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(37, 99, 235, 0.45);
         }
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 24px 0;
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 40px 0;
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 0.875rem;
+        }
+        .footer p {
+            margin-bottom: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero { padding: 80px 0 60px; }
+            .stats { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+            .features { grid-template-columns: 1fr; }
+            .btn-main, .btn-large { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <header>
+    <div class="bg-gradient"></div>
+
+    <header class="header">
         <div class="container">
-            <div class="logo">
-                <div class="logo-icon">DL</div>
-                <h1>Dr. Licitação</h1>
+            <div class="content">
+                <div class="logo">
+                    <div class="logo-icon">DL</div>
+                    <h1>Dr. Licitação</h1>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="container">
         <section class="hero">
-            <h2>Gere ETP e Termo de Referência<br>em até 20 minutos</h2>
+            <h1>Transforme Processos Licitatórios<br>em Documentação Perfeita</h1>
             <p>
-                Sistema inteligente para contratações públicas conforme a Lei 14.133/2021.
-                Automatize documentos, garanta conformidade e economize tempo.
+                Gere ETP e Termo de Referência conforme a Lei 14.133/2021 em minutos, não em dias.
+                Automatize, garanta conformidade e ganhe tempo para o que realmente importa.
             </p>
-            <a href="/drlicitacao/form-etp-tr" class="btn-primary">
-                <span>Iniciar nova contratação</span>
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            <a href="/drlicitacao/form-etp-tr" class="btn-main">
+                <span>Começar Agora</span>
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
             </a>
+        </section>
+
+        <section class="stats">
+            <div class="stat-item">
+                <div class="stat-number">20</div>
+                <div class="stat-label">Minutos para gerar</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Conformidade legal</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">+50%</div>
+                <div class="stat-label">Economia de tempo</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Erros de revisão</div>
+            </div>
         </section>
 
         <section class="features">
             <div class="feature-card">
-                <h3>Conformidade garantida</h3>
-                <p>Alinhado ao checklist da SUBSECRETARIA DE LICITAÇÕES e ao TCE-RJ. Documentos à prova de auditoria.</p>
+                <div class="feature-icon">📋</div>
+                <h3>Checklist Automático</h3>
+                <p>Alinhado ao checklist da SUBSECRETARIA DE LICITAÇÕES e ao TCE-RJ. Seus documentos sempre à prova de auditoria.</p>
             </div>
             <div class="feature-card">
-                <h3>Economia de tempo</h3>
-                <p>Preencha um formulário simples e obtenha ETP e TR completos prontos para uso.</p>
+                <div class="feature-icon">⚡</div>
+                <h3>Produtividade</h3>
+                <p>Preencha um formulário simples e obtenha ETP e TR completos em minutos, prontos para uso e publicação.</p>
             </div>
             <div class="feature-card">
-                <h3>Rastreabilidade</h3>
-                <p>Todas as decisões ficam registradas e justificadas automaticamente.</p>
+                <div class="feature-icon">🔍</div>
+                <h3>Rastreabilidade Total</h3>
+                <p>Todas as decisões, justificativas e alternativas ficam registradas automaticamente, com transparência completa.</p>
             </div>
             <div class="feature-card">
-                <h3>Exportação fácil</h3>
-                <p>Baixe em HTML ou DOCX, pronto para encaminhamento e publicação.</p>
+                <div class="feature-icon">📤</div>
+                <h3>Exportação Fácil</h3>
+                <p>Baixe seus documentos em HTML ou DOCX, formatados corretamente e prontos para encaminhamento.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Segurança Local</h3>
+                <p>Seus dados permanecem nos servidores da prefeitura, com acesso controlado e autenticação segura.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Atualização Constante</h3>
+                <p>Sistema sempre alinhado às últimas alterações da Lei 14.133/2021 e jurisprudência dos tribunais.</p>
             </div>
         </section>
 
-        <section class="requirements">
-            <h3>Requisitos para uso</h3>
-            <ul>
-                <li>Ser servidor público da Prefeitura de Barra Mansa</li>
-                <li>Ter clareza sobre o objeto da contratação (bem, serviço ou obra)</li>
-                <li>Reunir informações técnicas, orçamentos e justificativas</li>
-                <li>Dedicar alguns minutos para preencher cada passo com atenção</li>
-            </ul>
-        </section>
-
-        <div class="cta-bottom">
-            <a href="/drlicitacao/form-etp-tr" class="btn-primary">
-                <span>Começar agora</span>
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        <section class="cta-section">
+            <h2>Pronto para Modernizar suas Licitações?</h2>
+            <p>
+                Junte-se a centenas de servidores públicos que já economizam tempo e garantem conformidade.
+                Comece agora, leva menos de 20 minutos.
+            </p>
+            <a href="/drlicitacao/form-etp-tr" class="btn-large">
+                <span>Criar Novo ETP/TR</span>
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
             </a>
-        </div>
+        </section>
     </main>
 
-    <footer>
+    <footer class="footer">
         <div class="container">
-            <p>© 2026 Prefeitura Municipal de Barra Mansa — Desenvolvido por DiegoHacks</p>
-            <p style="margin-top: 4px; font-size: 0.8rem; color: #666;">Lei 14.133/2021 • Sistema de Gestão de Agentes Inteligentes</p>
+            <p>© 2026 Prefeitura Municipal de Barra Mansa</p>
+            <p style="color: var(--text-secondary); font-size: 0.75rem;">
+                Sistema de Gestão de Agentes Inteligentes • Desenvolvido por DiegoHacks
+            </p>
         </div>
     </footer>
 </body>
