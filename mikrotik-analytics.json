@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-03-29T14:20:27.159508-03:00",
-  "collected_at": "2026-03-29T14:20:27.159516-03:00",
+  "timestamp": "2026-03-29T19:10:46.578637-03:00",
+  "collected_at": "2026-03-29T19:10:46.578643-03:00",
   "status": "online",
-  "vlans_count": 37,
-  "pools_count": 50,
+  "vlans_count": 5,
+  "pools_count": 3,
   "networks_count": 166,
   "total_bandwidth_mbps": 850,
   "vlan_usage": [
@@ -34,64 +34,64 @@
   ],
   "top_talkers": [
     {
-      "ip": "172.16.50.34",
+      "ip": "172.16.77.160",
       "hostname": null,
-      "bandwidth_mbps": 604.2,
-      "total_gb": 906.3
+      "bandwidth_mbps": 767.9,
+      "total_gb": 1151.9
     },
     {
-      "ip": "172.16.1.3",
+      "ip": "172.16.65.231",
       "hostname": null,
-      "bandwidth_mbps": 687.7,
-      "total_gb": 1031.5
+      "bandwidth_mbps": 942.3,
+      "total_gb": 1413.5
     },
     {
-      "ip": "172.16.50.32",
+      "ip": "172.16.77.111",
       "hostname": null,
-      "bandwidth_mbps": 966.5,
-      "total_gb": 1449.8
+      "bandwidth_mbps": 837.4,
+      "total_gb": 1256.1
     },
     {
-      "ip": "172.16.61.49",
+      "ip": "172.16.49.81",
       "hostname": null,
-      "bandwidth_mbps": 573.5,
-      "total_gb": 860.2
+      "bandwidth_mbps": 638.2,
+      "total_gb": 957.3
     },
     {
-      "ip": "172.16.50.109",
+      "ip": "172.16.53.241",
       "hostname": null,
-      "bandwidth_mbps": 603.3,
-      "total_gb": 905.0
+      "bandwidth_mbps": 743.4,
+      "total_gb": 1115.2
     },
     {
-      "ip": "172.16.1.70",
+      "ip": "172.16.61.250",
       "hostname": null,
-      "bandwidth_mbps": 593.3,
-      "total_gb": 889.9
+      "bandwidth_mbps": 683.1,
+      "total_gb": 1024.7
     },
     {
-      "ip": "172.16.50.100",
+      "ip": "172.16.77.10",
       "hostname": null,
-      "bandwidth_mbps": 523.3,
-      "total_gb": 785.0
-    },
-    {
-      "ip": "172.16.61.248",
-      "hostname": null,
-      "bandwidth_mbps": 433.3,
-      "total_gb": 650.0
-    },
-    {
-      "ip": "172.16.49.199",
-      "hostname": null,
-      "bandwidth_mbps": 408.2,
-      "total_gb": 612.3
+      "bandwidth_mbps": 629.9,
+      "total_gb": 944.8
     },
     {
       "ip": "172.16.47.4",
       "hostname": null,
-      "bandwidth_mbps": 650.3,
-      "total_gb": 975.5
+      "bandwidth_mbps": 645.3,
+      "total_gb": 967.9
+    },
+    {
+      "ip": "172.16.86.210",
+      "hostname": null,
+      "bandwidth_mbps": 670.9,
+      "total_gb": 1006.3
+    },
+    {
+      "ip": "172.16.77.112",
+      "hostname": null,
+      "bandwidth_mbps": 488.5,
+      "total_gb": 732.7
     }
   ],
   "networks": [
@@ -848,24 +848,14 @@
   ],
   "alerts": [
     {
-      "type": "warning",
-      "message": "Mais de 37 VLANs configuradas",
-      "time": "2026-03-29T14:20:27.159446-03:00"
-    },
-    {
       "type": "info",
       "message": "Mais de 166 networks configurados",
-      "time": "2026-03-29T14:20:27.159446-03:00"
-    },
-    {
-      "type": "warning",
-      "message": "Mais de 50 pools DHCP configurados",
-      "time": "2026-03-29T14:20:27.159446-03:00"
+      "time": "2026-03-29T19:10:46.578582-03:00"
     },
     {
       "type": "danger",
-      "message": "1 usuário(s) >800 Mbps",
-      "time": "2026-03-29T14:20:27.159446-03:00"
+      "message": "2 usuário(s) >800 Mbps",
+      "time": "2026-03-29T19:10:46.578582-03:00"
     }
   ]
 }

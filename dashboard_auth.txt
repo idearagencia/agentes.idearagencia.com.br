@@ -1,0 +1,5 @@
+# Credenciais de acesso ao Dashboard AgentOS
+# Formato: username:senha (texto plano - para ambiente interno seguro)
+# Altere estas senhas!
+admin:Admin@2026
+diego:Diego@2026

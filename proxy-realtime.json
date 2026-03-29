@@ -1,24 +1,24 @@
 {
-  "timestamp": "2026-03-29T16:02:02.314169",
+  "timestamp": "2026-03-29T20:04:02.235472",
   "host": "proxy-01",
   "cpu": {
-    "usage_percent": 4.3,
+    "usage_percent": 3.2,
     "cores": 12,
-    "load_1min": 0.52,
-    "load_5min": 0.29,
-    "load_15min": 0.16
+    "load_1min": 0.38,
+    "load_5min": 0.34,
+    "load_15min": 0.2
   },
   "memory": {
     "total_gb": 15.42,
     "used_gb": 0.77,
-    "free_gb": 7.3,
+    "free_gb": 6.75,
     "percent": 5.0
   },
   "disk": {
     "total_gb": 410.4,
-    "used_gb": 22.1,
-    "free_gb": 368.2,
-    "percent": 5.4,
+    "used_gb": 23.1,
+    "free_gb": 367.2,
+    "percent": 5.6,
     "partitions": [
       {
         "filesystem": "/dev/sda3",
@@ -64,8 +64,8 @@
         "filesystem": "/dev/sda5",
         "mount": "/var",
         "total_gb": 183.0,
-        "used_gb": 11.0,
-        "free_gb": 163.0,
+        "used_gb": 12.0,
+        "free_gb": 162.0,
         "percent": 7.0
       }
     ]
@@ -76,6 +76,6 @@
     "active_connections": 121,
     "process_count": 19
   },
-  "collected_at": "2026-03-29T16:02:02.332993",
+  "collected_at": "2026-03-29T20:04:02.253701",
   "status": "online"
 }

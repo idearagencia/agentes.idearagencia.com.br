@@ -1,0 +1,20 @@
+# Autenticação AgentOS Dashboard
+<RequireAll>
+    # Públicas
+    <RequireAny>
+        Require expr %{REQUEST_URI} =~ m#^/(index\.html|login\.html|api/me)$#
+        Require valid-user
+    </RequireAny>
+</RequireAll>
+
+# Proteger apenas as rotas específicas
+<LocationMatch "^/(squid-dashboard|mikrotik-analytics|infra-dashboard|reports-dashboard|cloudhacks-dashboard|magic-course-dashboard|unifi-dashboard|netwatch|crypto|infra|api/(squid-stats|squid-alerts|mikrotik-stats|proxy-metrics))(?:$|/?)">
+    AuthType Basic
+    AuthName "Dashboard AgentOS"
+    AuthUserFile /etc/apache2/.htpasswd-admin
+    Require valid-user
+    # Não aplicar em index e login já cobertos acima
+    <If "%{REQUEST_URI} =~ m#^/(index\.html|login\.html|api/me)$#">
+        Require all granted
+    </If>
+</LocationMatch>

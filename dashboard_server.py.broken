@@ -1,0 +1,78 @@
+    def handle_squid_stats(self):
+        """Retorna estatísticas do Squid a partir do arquivo de alerta mais recente"""
+        ALERT_DIR = '/var/www/agentes.idearagencia.com.br/logs/squid'
+        try:
+            files = [f for f in os.listdir(ALERT_DIR) if f.startswith('squid_alert_') and f.endswith('.md')]
+            files.sort(reverse=True)
+            
+            stats = {
+                'total_requests': 0,
+                'status_4xx': 0,
+                'status_5xx': 0,
+                'unique_users': 0,
+                'unique_domains': 0,
+                'top_domains': {},
+                'top_users_bytes': [],
+                'auth_407_by_ip': {},
+                'suspicious': []
+            }
+            
+            if files:
+                latest = os.path.join(ALERT_DIR, files[0])
+                file_mtime = os.path.getmtime(latest)
+                file_dt_utc = datetime.fromtimestamp(file_mtime, tz=timezone.utc)
+                stats['last_analyzed'] = file_dt_utc.strftime('%Y-%m-%dT%H:%M:%SZ')
+                
+                with open(latest, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                def get_number(pattern):
+                    m = re.search(pattern, content, re.IGNORECASE)
+                    if m:
+                        num = m.group(1).replace(',', '').replace('.', '')
+                        try:
+                            return int(num)
+                        except:
+                            return 0
+                    return 0
+                
+                # Requisições e erros
+                stats['total_requests'] = get_number(r'(?:Total\s+de\s+)?requisições\s*(?:\(24h\))?:\s*([\d,.]+)')
+                stats['status_4xx'] = get_number(r'Erros\s+4xx\s*(?:\(24h\))?:\s*([\d,.]+)')
+                stats['status_5xx'] = get_number(r'Erros\s+5xx\s*(?:\(24h\))?:\s*([\d,.]+)')
+                stats['unique_users'] = get_number(r'Usuários\s+únicos\s*(?:\(24h\))?:\s*([\d,.]+)')
+                stats['unique_domains'] = get_number(r'Domínios\s+únicos\s*(?:\(24h\))?:\s*([\d,.]+)')
+                
+                # Top domínios
+                m = re.search(r'Top domínios(?:\(24h\))?:\s*(\{.*?\})', content, re.DOTALL)
+                if m:
+                    try:
+                        stats['top_domains'] = json.loads(m.group(1))
+                    except:
+                        pass
+                
+                # Top usuários por tráfego
+                m = re.search(r'Top usuários por tráfego:\s*(.+)', content, re.DOTALL)
+                if m:
+                    users_str = m.group(1)
+                    entries = re.findall(r'([^,(]+?)\s*\(([\d.]+)\s*MB?\)', users_str)
+                    stats['top_users_bytes'] = [(u.strip(), float(b)*1e6) for u,b in entries]
+                
+                # IPs com falhas 407
+                for line in re.findall(r'Alto volume de 407: IP ([\d.]+) com ([\d,.]+) falhas', content):
+                    ip, count = line
+                    stats['auth_407_by_ip'][ip] = int(count.replace(',','').replace('.',''))
+                
+                # Domínios suspeitos
+                stats['suspicious'] = []
+                for line in re.findall(r'Domínio suspeito:\s*([^\n]+?)\s*\(([^)]+)\)', content):
+                    domain, reason = line
+                    stats['suspicious'].append({'domain': domain.strip(), 'reason': reason.strip()})
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(stats).encode())
+        except Exception as e:
+            self.send_error(500, str(e))
